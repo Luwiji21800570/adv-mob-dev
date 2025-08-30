@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 
 export default function ProfilePage() {
-  // Static profile for froglover
   const user = {
     username: "froglover",
     bio: "Just a frog enjoying life 🐸✨",
@@ -10,7 +9,7 @@ export default function ProfilePage() {
     posts: [
       {
         id: 1,
-        image: require("../assets/image1.jpg"),
+        image: require("../assets/frog.jpg"),
         caption: "Forg 🌿",
       },
     ],
@@ -42,50 +41,68 @@ export default function ProfilePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#f0f4f8",
   },
   header: {
     alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-    marginBottom: 10,
+    padding: 25,
+    backgroundColor: "#FFF0CE",
+    marginBottom: 15,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
   profilePic: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    marginBottom: 12,
+    borderWidth: 3,
+    borderColor: "#fff",
   },
   username: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
+    color: "#4A3C1A",
   },
   bio: {
-    fontSize: 14,
-    color: "#555",
-    marginTop: 5,
+    fontSize: 15,
+    color: "#5C4B24",
+    marginTop: 6,
     textAlign: "center",
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "600",
-    paddingHorizontal: 15,
-    marginVertical: 10,
+    paddingHorizontal: 18,
+    marginVertical: 12,
+    color: "#333",
   },
   postsContainer: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 18,
   },
   postCard: {
     backgroundColor: "#fff",
-    marginBottom: 15,
-    borderRadius: 10,
+    marginBottom: 18,
+    borderRadius: 12,
     overflow: "hidden",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   postImage: {
     width: "100%",
-    height: 300,
+    height: 280,
   },
   caption: {
-    padding: 10,
+    padding: 12,
+    fontSize: 15,
+    color: "#444",
   },
 });

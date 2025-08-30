@@ -14,15 +14,15 @@ export default function ComponentShowcase() {
     {
       id: 1,
       title: "Forg",
-      image: require("../assets/image1.jpg"),
+      image: require("../assets/frog.jpg"),
       alertMsg: "Frogs go kokak !!!🚀",
       user: "froglover",
-      avatar: require("../assets/frogpfp.jpg"), // froglover’s pfp
+      avatar: require("../assets/frogpfp.jpg"),
     },
     {
       id: 2,
       title: "pika",
-      image: require("../assets/image2.jpg"),
+      image: require("../assets/pika.jpg"),
       alertMsg: "PIKAAAAAA ",
       user: "pikachu",
       avatar: null, // no pfp yet
@@ -30,7 +30,7 @@ export default function ComponentShowcase() {
     {
       id: 3,
       title: "shroomie",
-      image: require("../assets/image3.jpg"),
+      image: require("../assets/mush.jpg"),
       alertMsg: "Mushroomm!! 🍄✨",
       user: "mushlife",
       avatar: null,
@@ -38,7 +38,7 @@ export default function ComponentShowcase() {
     {
       id: 4,
       title: "grootie",
-      image: require("../assets/image4.jpg"),
+      image: require("../assets/groot.jpg"),
       alertMsg: "I AM GROOT",
       user: "iamgroot",
       avatar: null,
@@ -46,7 +46,7 @@ export default function ComponentShowcase() {
     {
       id: 5,
       title: "octie",
-      image: require("../assets/image5.jpg"),
+      image: require("../assets/octy.jpg"),
       alertMsg: "octopus 🐙",
       user: "octopus8",
       avatar: null,
@@ -54,7 +54,7 @@ export default function ComponentShowcase() {
     {
       id: 6,
       title: "santa",
-      image: require("../assets/image6.jpg"),
+      image: require("../assets/santa.jpg"),
       alertMsg: "christmas 🎅🎄",
       user: "xmasvibes",
       avatar: null,
@@ -69,7 +69,7 @@ export default function ComponentShowcase() {
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
-      <Text style={styles.header}>✨ My Gallery ✨</Text>
+      <Text style={styles.header}>✨ For You Page ✨</Text>
 
       {cards.map((card) => (
         <View key={card.id} style={styles.card}>
