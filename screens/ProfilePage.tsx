@@ -9,7 +9,7 @@ export default function ProfilePage() {
     posts: [
       {
         id: 1,
-        image: require("../assets/frog.jpg"),
+        image: require("../assets/image1.jpg"),
         caption: "Forg 🌿",
       },
     ],

@@ -14,7 +14,7 @@ export default function ComponentShowcase() {
     {
       id: 1,
       title: "Forg",
-      image: require("../assets/frog.jpg"),
+      image: require("../assets/image1.jpg"),
       alertMsg: "Frogs go kokak !!!🚀",
       user: "froglover",
       avatar: require("../assets/frogpfp.jpg"),
@@ -22,7 +22,7 @@ export default function ComponentShowcase() {
     {
       id: 2,
       title: "pika",
-      image: require("../assets/pika.jpg"),
+      image: require("../assets/image2.jpg"),
       alertMsg: "PIKAAAAAA ",
       user: "pikachu",
       avatar: null, // no pfp yet
@@ -30,7 +30,7 @@ export default function ComponentShowcase() {
     {
       id: 3,
       title: "shroomie",
-      image: require("../assets/mush.jpg"),
+      image: require("../assets/image3.jpg"),
       alertMsg: "Mushroomm!! 🍄✨",
       user: "mushlife",
       avatar: null,
@@ -38,7 +38,7 @@ export default function ComponentShowcase() {
     {
       id: 4,
       title: "grootie",
-      image: require("../assets/groot.jpg"),
+      image: require("../assets/image4.jpg"),
       alertMsg: "I AM GROOT",
       user: "iamgroot",
       avatar: null,
@@ -46,7 +46,7 @@ export default function ComponentShowcase() {
     {
       id: 5,
       title: "octie",
-      image: require("../assets/octy.jpg"),
+      image: require("../assets/image5.jpg"),
       alertMsg: "octopus 🐙",
       user: "octopus8",
       avatar: null,
@@ -54,7 +54,7 @@ export default function ComponentShowcase() {
     {
       id: 6,
       title: "santa",
-      image: require("../assets/santa.jpg"),
+      image: require("../assets/image6.jpg"),
       alertMsg: "christmas 🎅🎄",
       user: "xmasvibes",
       avatar: null,
