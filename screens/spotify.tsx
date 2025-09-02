@@ -1,3 +1,4 @@
+import LinearGradient from 'react-native-linear-gradient';
 import React, { useState } from 'react';
 import {
   View,
@@ -13,176 +14,183 @@ export default function Spotify() {
   const [isSignUp, setIsSignUp] = useState(false);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image
-        source={require('../assets/spotify.jpg')}
-        style={styles.logo}
-        accessibilityLabel="Spotify logo"
-      />
-      <Text style={styles.title} accessibilityRole="header">
-        Spotify
-      </Text>
-
-      <View style={styles.form}>
-        {isSignUp ? (
-          <>
-            <TextInput
-              placeholder="Email Address"
-              placeholderTextColor="#888"
-              style={styles.input}
-              accessibilityLabel="Enter your email address"
-              keyboardType="email-address"
-            />
-            <TextInput
-              placeholder="Full Name"
-              placeholderTextColor="#888"
-              style={styles.input}
-              accessibilityLabel="Enter your full name"
-            />
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor="#888"
-              secureTextEntry
-              style={styles.input}
-              accessibilityLabel="Enter your password"
-            />
-
-            <View style={styles.row}>
-              <Text style={styles.labelGreen}>Date of Birth:</Text>
-              <TextInput
-                placeholder="DD"
-                placeholderTextColor="#888"
-                style={[styles.input, styles.dateInput]}
-                accessibilityLabel="Day of birth"
-                keyboardType="numeric"
-              />
-              <TextInput
-                placeholder="MM"
-                placeholderTextColor="#888"
-                style={[styles.input, styles.dateInput]}
-                accessibilityLabel="Month of birth"
-                keyboardType="numeric"
-              />
-              <TextInput
-                placeholder="YY"
-                placeholderTextColor="#888"
-                style={[styles.input, styles.dateInput]}
-                accessibilityLabel="Year of birth"
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={styles.row}>
-              <TouchableOpacity
-                style={styles.genderBtn}
-                accessibilityRole="button"
-                accessibilityLabel="Select Male gender"
-              >
-                <Text style={styles.genderTextGreen}>Male</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.genderBtn}
-                accessibilityRole="button"
-                accessibilityLabel="Select Female gender"
-              >
-                <Text style={styles.genderTextGreen}>Female</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        ) : (
-          <>
-            <TextInput
-              placeholder="Username"
-              placeholderTextColor="#888"
-              style={styles.input}
-              accessibilityLabel="Enter your username"
-            />
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor="#888"
-              secureTextEntry
-              style={styles.input}
-              accessibilityLabel="Enter your password"
-            />
-            <Text style={styles.forgot} accessibilityRole="link">
-              Forgot password?
-            </Text>
-          </>
-        )}
-
-        <TouchableOpacity
-          style={styles.mainButton}
-          accessibilityRole="button"
-          accessibilityLabel={isSignUp ? 'Sign Up to Spotify' : 'Sign In to Spotify'}
-        >
-          <Text style={styles.mainButtonText}>
-            {isSignUp ? 'Sign Up' : 'Sign In'}
-          </Text>
-        </TouchableOpacity>
-
-        <Text
-          style={[styles.or, styles.orGreen]}
-          accessibilityLabel={
-            isSignUp
-              ? 'Sign up with social accounts'
-              : 'Be correct with social accounts'
-          }
-        >
-          {isSignUp ? 'Sign up with' : 'Be Correct With'}
+    <LinearGradient
+      colors={['#222222', '#000000']} 
+      style={styles.gradient}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <Image
+          source={require('../assets/spotify.jpg')}
+          style={styles.logo}
+          accessibilityLabel="Spotify logo"
+        />
+        <Text style={styles.title} accessibilityRole="header">
+          Spotify
         </Text>
 
-        <View
-          style={styles.socialRow}
-          accessible={true}
-          accessibilityLabel="Sign in with social accounts"
-        >
+        <View style={styles.form}>
+          {isSignUp ? (
+            <>
+              <TextInput
+                placeholder="Email Address"
+                placeholderTextColor="#888"
+                style={styles.input}
+                accessibilityLabel="Enter your email address"
+                keyboardType="email-address"
+              />
+              <TextInput
+                placeholder="Full Name"
+                placeholderTextColor="#888"
+                style={styles.input}
+                accessibilityLabel="Enter your full name"
+              />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor="#888"
+                secureTextEntry
+                style={styles.input}
+                accessibilityLabel="Enter your password"
+              />
+
+              <View style={styles.row}>
+                <Text style={styles.labelGreen}>Date of Birth:</Text>
+                <TextInput
+                  placeholder="DD"
+                  placeholderTextColor="#888"
+                  style={[styles.input, styles.dateInput]}
+                  accessibilityLabel="Day of birth"
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="MM"
+                  placeholderTextColor="#888"
+                  style={[styles.input, styles.dateInput]}
+                  accessibilityLabel="Month of birth"
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="YY"
+                  placeholderTextColor="#888"
+                  style={[styles.input, styles.dateInput]}
+                  accessibilityLabel="Year of birth"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View style={styles.row}>
+                <TouchableOpacity
+                  style={styles.genderBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel="Select Male gender"
+                >
+                  <Text style={styles.genderTextGreen}>Male</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.genderBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel="Select Female gender"
+                >
+                  <Text style={styles.genderTextGreen}>Female</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <TextInput
+                placeholder="Username"
+                placeholderTextColor="#888"
+                style={styles.input}
+                accessibilityLabel="Enter your username"
+              />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor="#888"
+                secureTextEntry
+                style={styles.input}
+                accessibilityLabel="Enter your password"
+              />
+              <Text style={styles.forgot} accessibilityRole="link">
+                Forgot password?
+              </Text>
+            </>
+          )}
+
           <TouchableOpacity
-            style={styles.socialBtn}
+            style={styles.mainButton}
             accessibilityRole="button"
-            accessibilityLabel="Sign in with Facebook"
+            accessibilityLabel={isSignUp ? 'Sign Up to Spotify' : 'Sign In to Spotify'}
           >
-            <Text style={styles.socialText}>f</Text>
+            <Text style={styles.mainButtonText}>
+              {isSignUp ? 'Sign Up' : 'Sign In'}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.socialBtn}
-            accessibilityRole="button"
-            accessibilityLabel="Sign in with Google"
+
+          <Text
+            style={[styles.or, styles.orGreen]}
+            accessibilityLabel={
+              isSignUp
+                ? 'Sign up with social accounts'
+                : 'Be correct with social accounts'
+            }
           >
-            <Text style={styles.socialText}>G</Text>
+            {isSignUp ? 'Sign up with' : 'Be Correct With'}
+          </Text>
+
+          <View
+            style={styles.socialRow}
+            accessible={true}
+            accessibilityLabel="Sign in with social accounts"
+          >
+            <TouchableOpacity
+              style={styles.socialBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Sign in with Facebook"
+            >
+              <Text style={styles.socialText}>f</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.socialBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Sign in with Google"
+            >
+              <Text style={styles.socialText}>G</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => setIsSignUp(!isSignUp)}
+            style={{ marginTop: 20 }}
+            accessibilityRole="button"
+            accessibilityLabel={
+              isSignUp
+                ? 'Already have an account? Sign In'
+                : "Don't have an account? Sign Up"
+            }
+          >
+            {isSignUp ? (
+              <Text style={{ textAlign: 'center', color: '#888' }}>
+                Already have an account?{' '}
+                <Text style={{ color: '#1DB954', fontWeight: 'bold' }}>Sign In</Text>
+              </Text>
+            ) : (
+              <Text style={{ textAlign: 'center', color: '#888' }}>
+                Don’t have an account?{' '}
+                <Text style={{ color: '#1DB954', fontWeight: 'bold' }}>Sign Up</Text>
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          onPress={() => setIsSignUp(!isSignUp)}
-          style={{ marginTop: 20 }}
-          accessibilityRole="button"
-          accessibilityLabel={
-            isSignUp
-              ? 'Already have an account? Sign In'
-              : "Don't have an account? Sign Up"
-          }
-        >
-          {isSignUp ? (
-            <Text style={{ textAlign: 'center', color: '#888' }}>
-              Already have an account?{' '}
-              <Text style={{ color: '#1DB954', fontWeight: 'bold' }}>Sign In</Text>
-            </Text>
-          ) : (
-            <Text style={{ textAlign: 'center', color: '#888' }}>
-              Don’t have an account?{' '}
-              <Text style={{ color: '#1DB954', fontWeight: 'bold' }}>Sign Up</Text>
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flexGrow: 1,
-    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 25,
@@ -213,11 +221,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 5,
   },
-  label: {
-    color: '#ccc',
-    marginTop: 10,
-    marginBottom: 5,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -232,8 +235,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     alignItems: 'center',
   },
-  genderText: {
-    color: '#fff',
+  genderTextGreen: {
+    color: '#1DB954',
   },
   forgot: {
     color: '#888',
@@ -257,8 +260,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 15,
   },
-  orSignIn: {
+  orGreen: {
     color: '#1DB954',
+    fontWeight: 'bold',
   },
   socialRow: {
     flexDirection: 'row',
@@ -278,39 +282,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
   },
-  toggle: {
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  grayText: {
-    color: '#888',
-  },
-  toggleGreen: {
-    color: '#1DB954',
-  },
-  whiteText: {
-    color: '#fff',
-  },
   labelGreen: {
     color: '#1DB954',
     marginTop: 10,
     marginBottom: 5,
-  },
-  genderTextGreen: {
-    color: '#1DB954',
-  },
-  orGreen: {
-    color: '#1DB954',
-    fontWeight: 'bold',
-  },
-  toggleWhite: {
-    color: '#888',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  toggleGreenAgain: {
-    color: '#1DB954',
-    textAlign: 'center',
-    marginTop: 20,
   },
 });
