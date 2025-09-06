@@ -1,36 +1,60 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StatusBar, useColorScheme } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import HomeScreen from './screens/HomeScreen';
-import ComponentShowcase from './screens/ComponentShowcase';
-import Spotify from './screens/spotify';
+// Screens
+import HomeScreen from "./screens/HomeScreen";   // 👈 entry point
+import Spotify from "./screens/Spotify";          // login screen
+import SpotifyHome from "./screens/SpotifyHome";
+import SpotifyProfile from "./screens/SpotifyProfile";
+import SpotifySettings from "./screens/SpotifySettings";
+import SpotifySignUp from "./screens/SpotifySignUp";
 
 export type RootStackParamList = {
-  Home: undefined;
-  ComponentShowcase: undefined;
+  HomeScreen: undefined;      // 👈 initial screen
   Spotify: undefined;
+  SpotifyHome: undefined;
+  SpotifyProfile: undefined;
+  SpotifySettings: undefined;
+  SpotifySignUp: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
+export default function App() {
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="ComponentShowcase" component={ComponentShowcase} />
-          <Stack.Screen name="Spotify" component={Spotify} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="HomeScreen">
+        <Stack.Screen
+          name="HomeScreen"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Spotify"
+          component={Spotify}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SpotifyHome"
+          component={SpotifyHome}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SpotifyProfile"
+          component={SpotifyProfile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SpotifySettings"
+          component={SpotifySettings}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SpotifySignUp"
+          component={SpotifySignUp}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-export default App;
