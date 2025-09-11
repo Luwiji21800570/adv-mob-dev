@@ -1,3 +1,12 @@
+![Screenshot 1](./screenshots/spot1.jpg)
+![Screenshot 2](./screenshots/spot2.jpg)
+![Screenshot 3](./screenshots/spot3.jpg)
+![Screenshot 4](./screenshots/spot4.jpg)
+![Screenshot 5](./screenshots/spot5.jpg)
+![Screenshot 6](./screenshots/spot6.jpg)
+
+
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
