@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "../App"; // 👈 adjust if needed
+import type { RootStackParamList } from "../App";
 
 const playlists = [
   { id: 1, title: "Top Hits", image: require("../assets/spotifyTopHits.jpg") },
@@ -104,7 +104,10 @@ const SpotifyHome: React.FC = () => {
             style={styles.drawerProfilePic}
           />
           <Text style={styles.drawerName}>Looweji</Text>
+          <Text style={styles.drawerSubtitle}>Premium User</Text>
         </View>
+
+        <View style={styles.divider} />
 
         <TouchableOpacity
           style={styles.drawerItem}
@@ -113,6 +116,7 @@ const SpotifyHome: React.FC = () => {
             navigation.navigate("SpotifyProfile");
           }}
         >
+          <Text style={styles.drawerIcon}>👤</Text>
           <Text style={styles.drawerText}>Profile</Text>
         </TouchableOpacity>
 
@@ -123,7 +127,21 @@ const SpotifyHome: React.FC = () => {
             navigation.navigate("SpotifySettings");
           }}
         >
+          <Text style={styles.drawerIcon}>⚙️</Text>
           <Text style={styles.drawerText}>Settings</Text>
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity
+          style={[styles.drawerItem, { marginTop: "auto" }]}
+          onPress={() => {
+            toggleDrawer();
+            navigation.navigate("Spotify");
+          }}
+        >
+          <Text style={styles.drawerIcon}>🚪</Text>
+          <Text style={[styles.drawerText, { color: "#E74C3C" }]}>Logout</Text>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -137,7 +155,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#000"
   },
-
   header: {
     padding: 20,
     flexDirection: "row",
@@ -160,7 +177,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold"
   },
-
   scroll: {
     paddingHorizontal: 15,
     paddingBottom: 100
@@ -171,7 +187,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginVertical: 10,
   },
-
   playlistGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -194,7 +209,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
   },
-
   player: {
     flexDirection: "row",
     alignItems: "center",
@@ -226,7 +240,6 @@ const styles = StyleSheet.create({
     color: "#1DB954",
     marginLeft: 10
   },
-
   drawer: {
     position: "absolute",
     top: 0,
@@ -246,8 +259,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 5,
   },
-
-  // Drawer Profile
   drawerHeader: {
     alignItems: "center",
     marginBottom: 30,
@@ -257,16 +268,31 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 10,
+    borderWidth: 3,
+    borderColor: "#1DB954",
   },
   drawerName: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
-
-  // Drawer Items
+  drawerSubtitle: {
+    color: "#888",
+    fontSize: 12,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#333",
+    marginVertical: 15,
+  },
   drawerItem: {
-    paddingVertical: 12
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  drawerIcon: {
+    fontSize: 18,
+    marginRight: 10,
   },
   drawerText: {
     color: "#fff",
