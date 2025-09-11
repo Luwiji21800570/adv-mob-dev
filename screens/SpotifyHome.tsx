@@ -59,10 +59,19 @@ const SpotifyHome: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.sectionTitle}>Your Playlists</Text>
         <View style={styles.playlistGrid}>
           {playlists.map((pl) => (
-            <TouchableOpacity key={pl.id} style={styles.playlistCard}>
+            <TouchableOpacity
+              key={pl.id}
+              style={styles.playlistCard}
+              onPress={() => {
+                if (pl.title === "Chill Vibes") {
+                  navigation.navigate("Playlist", { playlist: pl });
+                } else {
+                  console.log(`Clicked on ${pl.title}`);
+                }
+              }}
+            >
               <Image source={pl.image} style={styles.playlistImage} />
               <Text style={styles.playlistTitle}>{pl.title}</Text>
             </TouchableOpacity>

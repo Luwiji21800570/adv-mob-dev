@@ -19,22 +19,19 @@ const SpotifySettings: React.FC = () => {
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
 
   const handleLogout = () => {
-    navigation.navigate("Spotify"); // Go back to Spotify.tsx
+    navigation.navigate("Spotify");
   };
 
   return (
     <View style={styles.container}>
-      {/* Header with Back button */}
       <View style={styles.headerRow}>
         <TouchableOpacity onPress={() => navigation.navigate("SpotifyHome")}>
           <Text style={styles.backBtn}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.header}>Settings ⚙️</Text>
         <View style={{ width: 50 }} />
-        {/* Spacer to balance the back button */}
       </View>
 
-      {/* Notification toggle */}
       <View style={styles.settingRow}>
         <Text style={styles.settingText}>Notifications</Text>
         <Switch
@@ -45,7 +42,6 @@ const SpotifySettings: React.FC = () => {
         />
       </View>
 
-      {/* Dark Mode toggle */}
       <View style={styles.settingRow}>
         <Text style={styles.settingText}>Dark Mode</Text>
         <Switch
@@ -56,7 +52,6 @@ const SpotifySettings: React.FC = () => {
         />
       </View>
 
-      {/* Logout button */}
       <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>

@@ -17,14 +17,12 @@ export default function ProfilePage() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Profile Header */}
       <View style={styles.header}>
         <Image source={user.profilePic} style={styles.profilePic} />
         <Text style={styles.username}>{user.username}</Text>
         <Text style={styles.bio}>{user.bio}</Text>
       </View>
 
-      {/* Posts Section */}
       <Text style={styles.sectionTitle}>Posts</Text>
       <View style={styles.postsContainer}>
         {user.posts.map((post) => (

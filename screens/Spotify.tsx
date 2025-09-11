@@ -40,7 +40,6 @@ const Spotify: React.FC<Props> = ({ navigation }) => {
           />
           <Text style={styles.forgot}>Forgot password?</Text>
 
-          {/* Sign In Button */}
           <TouchableOpacity
             style={styles.mainButton}
             onPress={() => navigation?.navigate("SpotifyHome")}

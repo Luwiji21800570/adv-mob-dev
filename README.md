@@ -4,7 +4,8 @@
 ![Screenshot 4](./screenshots/spot4.jpg)
 ![Screenshot 5](./screenshots/spot5.jpg)
 ![Screenshot 6](./screenshots/spot6.jpg)
-![Screenshot 7](./screenshots/spot7.jpg))
+![Screenshot 7](./screenshots/spot7.jpg)
+![Screenshot 8](./screenshots/spot8.jpg))
 
 
 

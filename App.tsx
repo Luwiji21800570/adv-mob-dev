@@ -1,21 +1,22 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-// Screens
-import HomeScreen from "./screens/HomeScreen";   // 👈 entry point
-import Spotify from "./screens/Spotify";          // login screen
+import HomeScreen from "./screens/HomeScreen";
+import Spotify from "./screens/Spotify";
 import SpotifyHome from "./screens/SpotifyHome";
 import SpotifyProfile from "./screens/SpotifyProfile";
 import SpotifySettings from "./screens/SpotifySettings";
 import SpotifySignUp from "./screens/SpotifySignUp";
+import PlaylistScreen from "./screens/PlaylistScreen";
 
 export type RootStackParamList = {
-  HomeScreen: undefined;      // 👈 initial screen
+  HomeScreen: undefined;
   Spotify: undefined;
   SpotifyHome: undefined;
   SpotifyProfile: undefined;
   SpotifySettings: undefined;
   SpotifySignUp: undefined;
+  Playlist: { playlist: any };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -52,6 +53,11 @@ export default function App() {
         <Stack.Screen
           name="SpotifySignUp"
           component={SpotifySignUp}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Playlist"
+          component={PlaylistScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
