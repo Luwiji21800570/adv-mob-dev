@@ -1,98 +1,214 @@
-import React, { useState } from "react";
+import React, { useReducer, useState, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
-  Image,
-  FlatList,
+  TextInput,
   TouchableOpacity,
+  FlatList,
+  StyleSheet,
 } from "react-native";
-import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import YoutubePlayer from "react-native-youtube-iframe";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-import type { RootStackParamList } from "../App";
+type Song = {
+  id: string;
+  title: string;
+  url: string;
+};
 
-type PlaylistRouteProp = RouteProp<RootStackParamList, "Playlist">;
+type State = {
+  past: Song[][];
+  present: Song[];
+  future: Song[][];
+};
+
+type Action =
+  | { type: "ADD"; song: Song }
+  | { type: "REMOVE"; id: string }
+  | { type: "CLEAR" }
+  | { type: "UNDO" }
+  | { type: "REDO" }
+  | { type: "SET"; songs: Song[] };
+
+function playlistReducer(state: State, action: Action): State {
+  const { past, present, future } = state;
+  switch (action.type) {
+    case "ADD":
+      return {
+        past: [...past, present],
+        present: [...present, action.song],
+        future: [],
+      };
+    case "REMOVE":
+      return {
+        past: [...past, present],
+        present: present.filter((s) => s.id !== action.id),
+        future: [],
+      };
+    case "CLEAR":
+      return { past: [...past, present], present: [], future: [] };
+    case "UNDO":
+      if (!past.length) return state;
+      return {
+        past: past.slice(0, -1),
+        present: past[past.length - 1],
+        future: [present, ...future],
+      };
+    case "REDO":
+      if (!future.length) return state;
+      return {
+        past: [...past, present],
+        present: future[0],
+        future: future.slice(1),
+      };
+    case "SET":
+      return { past: [], present: action.songs, future: [] };
+    default:
+      return state;
+  }
+}
 
 const PlaylistScreen: React.FC = () => {
-  const route = useRoute<PlaylistRouteProp>();
   const navigation = useNavigation();
+  const route = useRoute<any>();
   const { playlist } = route.params;
 
-  const [playingSong, setPlayingSong] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(playlistReducer, {
+    past: [],
+    present: [],
+    future: [],
+  });
 
-  // Songs with YouTube video IDs
-  const songs = [
-    {
-      id: "1",
-      title: "Multo",
-      artist: "Cup of Joe",
-      image: require("../assets/multo.jpg"),
-      videoId: "Rht8rS4cR1s",
-    },
-    {
-      id: "2",
-      title: "Old Love",
-      artist: "Yuji & Putri Dahlia",
-      image: require("../assets/old.jpg"),
-      videoId: "SctrVF37GAQ",
-    },
-    {
-      id: "3",
-      title: "Chill Song 3",
-      artist: "Artist C",
-      // No image/video
-    },
-  ];
+  const [newSongTitle, setNewSongTitle] = useState("");
+  const [newSongUrl, setNewSongUrl] = useState("");
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
-  const toggleSong = (id: string) => {
-    setPlayingSong((prev) => (prev === id ? null : id));
+  const storageKey = `playlist_${playlist.id}_songs`;
+
+  // Load from storage
+  useEffect(() => {
+    (async () => {
+      const saved = await AsyncStorage.getItem(storageKey);
+      if (saved) {
+        dispatch({ type: "SET", songs: JSON.parse(saved) });
+      }
+    })();
+  }, [storageKey]);
+
+  // Save whenever present changes
+  useEffect(() => {
+    AsyncStorage.setItem(storageKey, JSON.stringify(state.present));
+  }, [state.present]);
+
+  const addSong = () => {
+    if (!newSongTitle.trim() || !newSongUrl.trim()) return;
+    const newSong: Song = {
+      id: Date.now().toString(),
+      title: newSongTitle.trim(),
+      url: newSongUrl.trim(),
+    };
+    dispatch({ type: "ADD", song: newSong });
+    setNewSongTitle("");
+    setNewSongUrl("");
+  };
+
+  const extractVideoId = (url: string): string | null => {
+    const match = url.match(/(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : null;
+  };
+
+  const playSong = (url: string) => {
+    const videoId = extractVideoId(url);
+    if (videoId) {
+      setPlayingVideoId(videoId);
+    } else {
+      alert("Invalid YouTube URL");
+    }
   };
 
   return (
     <View style={styles.container}>
       {/* Back Button */}
       <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.navigate("SpotifyHome" as never)}
+        style={styles.backBtn}
+        onPress={() => navigation.goBack()}
       >
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      {/* Playlist Cover */}
-      <Image source={playlist.image} style={styles.cover} resizeMode="cover" />
-
       {/* Playlist Title */}
       <Text style={styles.title}>{playlist.title}</Text>
 
-      {/* Songs List */}
+      {/* Add Song */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Song Title"
+          placeholderTextColor="#888"
+          value={newSongTitle}
+          onChangeText={setNewSongTitle}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="YouTube Link"
+          placeholderTextColor="#888"
+          value={newSongUrl}
+          onChangeText={setNewSongUrl}
+        />
+        <TouchableOpacity style={styles.addBtn} onPress={addSong}>
+          <Text style={styles.addBtnText}>＋ Add Song</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Controls */}
+      <View style={styles.controls}>
+        <TouchableOpacity onPress={() => dispatch({ type: "UNDO" })}>
+          <Text style={styles.controlText}>⟲ Undo</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => dispatch({ type: "REDO" })}>
+          <Text style={styles.controlText}>⟳ Redo</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => dispatch({ type: "CLEAR" })}>
+          <Text style={[styles.controlText, { color: "#E74C3C" }]}>✖ Clear</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Songs */}
       <FlatList
-        data={songs}
+        data={state.present}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.songRow}>
-            {/* Song image with press-to-play */}
-            {item.image && (
-              <TouchableOpacity onPress={() => toggleSong(item.id)}>
-                <Image source={item.image} style={styles.songImage} />
-              </TouchableOpacity>
-            )}
-
-            {/* Song details */}
-            <View>
-              <Text style={styles.songTitle}>{item.title}</Text>
-              <Text style={styles.songArtist}>{item.artist}</Text>
-            </View>
-
-            {/* YouTube player */}
-            {playingSong === item.id && item.videoId && (
-              <View style={{ marginTop: 10, flex: 1 }}>
-                <YoutubePlayer height={200} play={true} videoId={item.videoId} />
-              </View>
-            )}
-          </View>
+          <TouchableOpacity
+            style={styles.songItem}
+            onPress={() => playSong(item.url)}
+          >
+            <Text style={styles.songText}>{item.title}</Text>
+            <TouchableOpacity
+              onPress={() => dispatch({ type: "REMOVE", id: item.id })}
+            >
+              <Text style={styles.deleteBtn}>🗑️</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No songs yet. Add one!</Text>
+        }
       />
+
+      {/* YouTube Player */}
+      {playingVideoId && (
+        <View style={styles.playerContainer}>
+          <YoutubePlayer
+            height={230}
+            play={true}
+            videoId={playingVideoId}
+            onChangeState={(state) => {
+              if (state === "ended") setPlayingVideoId(null);
+            }}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -100,55 +216,51 @@ const PlaylistScreen: React.FC = () => {
 export default PlaylistScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000",
-    padding: 20,
-  },
-  backButton: {
+  container: { flex: 1, backgroundColor: "#000", padding: 20 },
+  backBtn: { marginBottom: 15 },
+  backText: { color: "#1DB954", fontSize: 16, fontWeight: "600" },
+  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20, color: "#fff" },
+  inputContainer: { marginBottom: 20 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#222",
+    backgroundColor: "#111",
+    color: "#fff",
+    padding: 12,
     marginBottom: 10,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    alignSelf: "flex-start",
-    backgroundColor: "#1DB954",
-    borderRadius: 6,
-  },
-  backText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  cover: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  songRow: {
-    flexDirection: "column",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#222",
-  },
-  songImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 6,
-    marginRight: 12,
-  },
-  songTitle: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  songArtist: {
-    color: "#888",
+    borderRadius: 8,
     fontSize: 14,
+  },
+  addBtn: {
+    backgroundColor: "#1DB954",
+    paddingVertical: 12,
+    borderRadius: 30,
+    alignItems: "center",
+  },
+  addBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  controls: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 15,
+  },
+  controlText: { color: "#1DB954", fontSize: 16, fontWeight: "600" },
+  songItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#111",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  songText: { color: "#fff", fontSize: 16, fontWeight: "500" },
+  deleteBtn: { fontSize: 18, color: "#E74C3C" },
+  emptyText: { textAlign: "center", color: "#888", marginTop: 20 },
+  playerContainer: {
+    marginTop: 20,
+    borderRadius: 12,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#222",
   },
 });

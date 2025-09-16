@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -13,11 +13,56 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
 
+// Mock playlists
 const playlists = [
-  { id: 1, title: "Top Hits", image: require("../assets/spotifyTopHits.jpg") },
-  { id: 2, title: "Chill Vibes", image: require("../assets/spotifyChill.jpg") },
-  { id: 3, title: "Workout Mix", image: require("../assets/spotifyWorkout.jpg") },
-  { id: 4, title: "Party Time", image: require("../assets/spotifyParty.jpg") },
+  {
+    id: 1,
+    title: "Top Hits",
+    type: "music",
+    image: require("../assets/spotifyTopHits.jpg"),
+  },
+  {
+    id: 2,
+    title: "Chill Vibes",
+    type: "music",
+    image: require("../assets/spotifyChill.jpg"),
+  },
+  {
+    id: 3,
+    title: "Workout Mix",
+    type: "music",
+    image: require("../assets/spotifyWorkout.jpg"),
+  },
+  {
+    id: 4,
+    title: "Party Time",
+    type: "music",
+    image: require("../assets/spotifyParty.jpg"),
+  },
+  {
+    id: 5,
+    title: "Daily News",
+    type: "podcasts",
+    image: require("../assets/spotifyPodcast1.jpg"),
+  },
+  {
+    id: 6,
+    title: "Motivation Talks",
+    type: "podcasts",
+    image: require("../assets/spotifyPodcast2.jpg"),
+  },
+  {
+    id: 7,
+    title: "Jazz Classics",
+    type: "music",
+    image: require("../assets/spotifyJazz.jpg"),
+  },
+  {
+    id: 8,
+    title: "Indie Essentials",
+    type: "music",
+    image: require("../assets/spotifyIndie.jpg"),
+  },
 ];
 
 type HomeScreenNav = NativeStackNavigationProp<
@@ -30,7 +75,8 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const SpotifyHome: React.FC = () => {
   const navigation = useNavigation<HomeScreenNav>();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const slideAnim = React.useRef(new Animated.Value(-SCREEN_WIDTH)).current;
+  const [filter, setFilter] = useState<"all" | "music" | "podcasts">("all");
+  const slideAnim = useRef(new Animated.Value(-SCREEN_WIDTH)).current;
 
   const toggleDrawer = () => {
     if (drawerOpen) {
@@ -49,8 +95,14 @@ const SpotifyHome: React.FC = () => {
     }
   };
 
+  const filteredPlaylists =
+    filter === "all"
+      ? playlists
+      : playlists.filter((pl) => pl.type === filter);
+
   return (
     <View style={styles.container}>
+      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.navBtn} onPress={toggleDrawer}>
           <Text style={styles.navBtnText}>☰</Text>
@@ -58,27 +110,41 @@ const SpotifyHome: React.FC = () => {
         <Text style={styles.headerText}>Good Evening 🎶</Text>
       </View>
 
+      {/* FILTER TABS */}
+      <View style={styles.filterRow}>
+        {["all", "music", "podcasts"].map((f) => (
+          <TouchableOpacity
+            key={f}
+            style={[styles.filterBtn, filter === f && styles.filterBtnActive]}
+            onPress={() => setFilter(f as "all" | "music" | "podcasts")}
+          >
+            <Text
+              style={[styles.filterText, filter === f && styles.filterTextActive]}
+            >
+              {f.charAt(0).toUpperCase() + f.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* PLAYLISTS */}
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.playlistGrid}>
-          {playlists.map((pl) => (
+          {filteredPlaylists.map((pl) => (
             <TouchableOpacity
               key={pl.id}
               style={styles.playlistCard}
-              onPress={() => {
-                if (pl.title === "Chill Vibes") {
-                  navigation.navigate("Playlist", { playlist: pl });
-                } else {
-                  console.log(`Clicked on ${pl.title}`);
-                }
-              }}
+              onPress={() => navigation.navigate("Playlist", { playlist: pl })}
             >
               <Image source={pl.image} style={styles.playlistImage} />
               <Text style={styles.playlistTitle}>{pl.title}</Text>
             </TouchableOpacity>
           ))}
+
         </View>
       </ScrollView>
 
+      {/* MINI PLAYER */}
       <View style={styles.player}>
         <Image
           source={require("../assets/spotify.jpg")}
@@ -93,6 +159,7 @@ const SpotifyHome: React.FC = () => {
         </TouchableOpacity>
       </View>
 
+      {/* BACKDROP */}
       {drawerOpen && (
         <TouchableOpacity
           style={styles.backdrop}
@@ -101,11 +168,9 @@ const SpotifyHome: React.FC = () => {
         />
       )}
 
+      {/* DRAWER */}
       <Animated.View
-        style={[
-          styles.drawer,
-          { transform: [{ translateX: slideAnim }] },
-        ]}
+        style={[styles.drawer, { transform: [{ translateX: slideAnim }] }]}
       >
         <View style={styles.drawerHeader}>
           <Image
@@ -162,7 +227,7 @@ export default SpotifyHome;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000"
+    backgroundColor: "#000",
   },
   header: {
     padding: 20,
@@ -179,22 +244,39 @@ const styles = StyleSheet.create({
   navBtnText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 18
+    fontSize: 18,
   },
   headerText: {
     color: "#fff",
     fontSize: 24,
-    fontWeight: "bold"
+    fontWeight: "bold",
+  },
+  filterRow: {
+    flexDirection: "row",
+    paddingHorizontal: 15,
+    marginBottom: 10,
+  },
+  filterBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: "#222",
+    marginRight: 10,
+  },
+  filterBtnActive: {
+    backgroundColor: "#1DB954",
+  },
+  filterText: {
+    color: "#aaa",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  filterTextActive: {
+    color: "#fff",
   },
   scroll: {
     paddingHorizontal: 15,
-    paddingBottom: 100
-  },
-  sectionTitle: {
-    color: "#1DB954",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 10,
+    paddingBottom: 100,
   },
   playlistGrid: {
     flexDirection: "row",
@@ -210,7 +292,7 @@ const styles = StyleSheet.create({
   },
   playlistImage: {
     width: "100%",
-    height: 120
+    height: 120,
   },
   playlistTitle: {
     color: "#fff",
@@ -234,20 +316,20 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 5,
-    marginRight: 10
+    marginRight: 10,
   },
   songTitle: {
     color: "#fff",
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   songArtist: {
     color: "#888",
-    fontSize: 12
+    fontSize: 12,
   },
   playBtn: {
     fontSize: 28,
     color: "#1DB954",
-    marginLeft: 10
+    marginLeft: 10,
   },
   drawer: {
     position: "absolute",
@@ -305,6 +387,6 @@ const styles = StyleSheet.create({
   },
   drawerText: {
     color: "#fff",
-    fontSize: 16
+    fontSize: 16,
   },
 });
