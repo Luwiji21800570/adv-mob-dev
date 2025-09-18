@@ -64,7 +64,7 @@ const ProfilePreview = React.memo(function ProfilePreview({
   visible: boolean;
 }) {
   const fallbackUri = useMemo(() => {
-    return `https://via.placeholder.com/100?text=${encodeURIComponent(
+    return `https://via.placeholder.com/150/1DB954/ffffff?text=${encodeURIComponent(
       username || "User"
     )}`;
   }, [username]);
@@ -77,18 +77,17 @@ const ProfilePreview = React.memo(function ProfilePreview({
         source={{ uri: photoUri || fallbackUri }}
         style={styles.previewImage}
       />
-      <View style={{ marginLeft: 14 }}>
-        <Text style={styles.previewName}>{username || "Username"}</Text>
-        <Text style={styles.previewEmail}>{email || "email@example.com"}</Text>
-        <View style={styles.genrePill}>
-          <Text style={styles.genreText}>
-            {genres.length > 0 ? genres.join(", ") : "Genre"}
-          </Text>
-        </View>
+      <Text style={styles.previewName}>{username || "Username"}</Text>
+      <Text style={styles.previewEmail}>{email || "email@example.com"}</Text>
+      <View style={styles.genrePill}>
+        <Text style={styles.genreText}>
+          {genres.length > 0 ? genres.join(", ") : "Genre"}
+        </Text>
       </View>
     </FadeInView>
   );
 });
+
 
 const SpotifyProfile: React.FC = () => {
   const navigation = useNavigation<ProfileNav>();
@@ -317,7 +316,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    marginBottom: 6,
+    marginBottom: 12,
   },
   backBtn: {
     color: "#1DB954",
@@ -326,107 +325,142 @@ const styles = StyleSheet.create({
   },
   header: {
     color: "#fff",
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 22,
+    fontWeight: "800",
     textAlign: "center",
+    letterSpacing: 0.5,
   },
+
+  // --- Profile Preview ---
   previewCard: {
     width: "100%",
     backgroundColor: "#121212",
-    borderRadius: 12,
-    padding: 14,
-    flexDirection: "row",
-    alignItems: "center",
+    borderRadius: 16,
+    padding: 20,
+    alignItems: "center", // centers content
+    marginVertical: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#222",
   },
   previewImage: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 2,
+    width: 120, // bigger circle
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
     borderColor: "#1DB954",
+    marginBottom: 14,
+    shadowColor: "#1DB954",
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 6,
   },
   previewName: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "700",
+    textAlign: "center",
   },
   previewEmail: {
-    color: "#bbb",
+    color: "#aaa",
     marginTop: 6,
-    fontSize: 13,
+    fontSize: 15,
+    textAlign: "center",
   },
   genrePill: {
-    marginTop: 8,
-    backgroundColor: "rgba(29,185,84,0.12)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    marginTop: 12,
+    backgroundColor: "rgba(29,185,84,0.15)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 999,
-    alignSelf: "flex-start",
+    alignSelf: "center",
   },
   genreText: {
     color: "#1DB954",
     fontWeight: "600",
     fontSize: 13,
   },
+
+  // --- Labels & Errors ---
   label: {
     alignSelf: "flex-start",
-    color: "#ddd",
+    color: "#bbb",
     marginBottom: 6,
-    fontWeight: "600",
+    fontWeight: "700",
+    fontSize: 13,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
   errText: {
     color: "#ff6b6b",
     marginTop: 6,
     alignSelf: "flex-start",
   },
+
+  // --- Genres ---
   genreRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    width: 320,
-    maxWidth: "100%",
+    width: "100%",
   },
   genreButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#151515",
+    backgroundColor: "#1a1a1a",
     borderWidth: 1,
-    borderColor: "#252525",
+    borderColor: "#333",
     marginRight: 8,
-    marginTop: 6,
+    marginTop: 8,
   },
   genreButtonSelected: {
     backgroundColor: "#1DB954",
     borderColor: "#1DB954",
   },
   genreButtonText: {
-    color: "#ddd",
+    color: "#eee",
+    fontWeight: "500",
   },
   genreButtonTextSelected: {
     color: "#000",
     fontWeight: "700",
   },
+
+  // --- Buttons ---
   submitBtn: {
     backgroundColor: "#1DB954",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
     borderRadius: 30,
+    shadowColor: "#1DB954",
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 6,
   },
   submitBtnText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "800",
+    textAlign: "center",
+    letterSpacing: 0.3,
   },
   uploadBtn: {
     marginTop: 12,
     marginBottom: 12,
-    backgroundColor: "#1DB954",
+    backgroundColor: "transparent",
+    borderColor: "#1DB954",
+    borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
   },
   uploadBtnText: {
-    color: "#fff",
+    color: "#1DB954",
     fontWeight: "600",
   },
 });
+
+
