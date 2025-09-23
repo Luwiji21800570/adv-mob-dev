@@ -8,51 +8,143 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "../App"; // adjust path if needed
+import type { RootStackParamList } from "../App";
 
-type SettingsNav = NativeStackNavigationProp<RootStackParamList, "SpotifySettings">;
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../src/store";
+import { setTheme } from "../src/store/themeSlice";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { themes } from "../theme/themes";
+
+type SettingsNav = NativeStackNavigationProp<
+  RootStackParamList,
+  "SpotifySettings"
+>;
 
 const SpotifySettings: React.FC = () => {
   const navigation = useNavigation<SettingsNav>();
+  const dispatch = useDispatch();
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+
+  const { mode } = useSelector((state: RootState) => state.theme);
+  const theme = themes[mode];
 
   const handleLogout = () => {
     navigation.navigate("Spotify");
   };
 
+  // 🔹 save theme choice + dispatch
+  const handleThemeChange = async (newMode: keyof typeof themes) => {
+    dispatch(setTheme(newMode));
+    try {
+      await AsyncStorage.setItem("themeMode", newMode);
+    } catch (e) {
+      console.warn("Failed to save theme:", e);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      {/* Header */}
       <View style={styles.headerRow}>
         <TouchableOpacity onPress={() => navigation.navigate("SpotifyHome")}>
-          <Text style={styles.backBtn}>← Back</Text>
+          <Text style={[styles.backBtn, { color: theme.colors.primary }]}>
+            ← Back
+          </Text>
         </TouchableOpacity>
-        <Text style={styles.header}>Settings ⚙️</Text>
+        <Text style={[styles.header, { color: theme.colors.text }]}>
+          Settings ⚙️
+        </Text>
         <View style={{ width: 50 }} />
       </View>
 
-      <View style={styles.settingRow}>
-        <Text style={styles.settingText}>Notifications</Text>
+      {/* Notifications */}
+      <View
+        style={[
+          styles.settingRow,
+          { backgroundColor: theme.colors.card },
+        ]}
+      >
+        <Text style={[styles.settingText, { color: theme.colors.text }]}>
+          Notifications
+        </Text>
         <Switch
           value={notificationsEnabled}
           onValueChange={setNotificationsEnabled}
-          thumbColor={notificationsEnabled ? "#1DB954" : "#888"}
-          trackColor={{ false: "#444", true: "#1DB954" }}
+          thumbColor={notificationsEnabled ? theme.colors.primary : "#888"}
+          trackColor={{ false: "#444", true: theme.colors.primary }}
         />
       </View>
 
-      <View style={styles.settingRow}>
-        <Text style={styles.settingText}>Dark Mode</Text>
-        <Switch
-          value={darkModeEnabled}
-          onValueChange={setDarkModeEnabled}
-          thumbColor={darkModeEnabled ? "#1DB954" : "#888"}
-          trackColor={{ false: "#444", true: "#1DB954" }}
+      {/* Theme Selector */}
+      <View
+        style={[
+          styles.settingRow,
+          {
+            backgroundColor: theme.colors.card,
+            flexDirection: "column",
+            alignItems: "center",
+            paddingVertical: 20,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.settingText,
+            { color: theme.colors.text, fontSize: 18, fontWeight: "700" },
+          ]}
+        >
+          Theme
+        </Text>
+
+        <View
+          style={{
+            height: 2,
+            backgroundColor: theme.colors.primary,
+            width: "40%",
+            marginVertical: 10,
+            borderRadius: 2,
+          }}
         />
+
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          {Object.keys(themes).map((m) => (
+            <TouchableOpacity
+              key={m}
+              style={[
+                styles.themeButton,
+                mode === m && { backgroundColor: theme.colors.primary },
+              ]}
+              onPress={() => handleThemeChange(m as keyof typeof themes)}
+            >
+              <Text
+                style={[
+                  styles.themeButtonText,
+                  { color: mode === m ? "#000" : "#fff" },
+                ]}
+              >
+                {m.charAt(0).toUpperCase() + m.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
-      <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+      {/* Logout */}
+      <TouchableOpacity
+        style={[styles.logoutBtn, { backgroundColor: theme.colors.primary }]}
+        onPress={handleLogout}
+      >
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </View>
@@ -64,7 +156,6 @@ export default SpotifySettings;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
     padding: 20,
   },
   headerRow: {
@@ -74,12 +165,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backBtn: {
-    color: "#1DB954",
     fontSize: 16,
     fontWeight: "600",
   },
   header: {
-    color: "#fff",
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
@@ -89,20 +178,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#111",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginBottom: 15,
   },
   settingText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "500",
   },
+  themeButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    marginRight: 10,
+    marginBottom: 10,
+    backgroundColor: "#333",
+    minWidth: 80,
+    alignItems: "center",
+  },
+  themeButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+  },
   logoutBtn: {
     marginTop: 40,
-    backgroundColor: "#1DB954",
     paddingVertical: 15,
     borderRadius: 30,
     alignItems: "center",

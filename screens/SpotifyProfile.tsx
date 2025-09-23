@@ -15,6 +15,11 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../App";
 import * as ImagePicker from "react-native-image-picker";
 
+// 🟢 Redux + Themes
+import { useSelector } from "react-redux";
+import { RootState } from "../src/store";
+import { themes } from "../theme/themes";
+
 import AnimatedInput from "../components/AnimatedInput";
 import FadeInView from "../components/FadeInView";
 import Shakeable, { ShakeableRef } from "../components/Shakeable";
@@ -56,31 +61,38 @@ const ProfilePreview = React.memo(function ProfilePreview({
   genres,
   photoUri,
   visible,
+  theme,
 }: {
   username: string;
   email: string;
   genres: string[];
   photoUri?: string;
   visible: boolean;
+  theme: typeof themes["light"];
 }) {
   const fallbackUri = useMemo(() => {
-    return `https://via.placeholder.com/150/1DB954/ffffff?text=${encodeURIComponent(
-      username || "User"
-    )}`;
-  }, [username]);
+    return `https://via.placeholder.com/150/${theme.colors.primary.replace(
+      "#",
+      ""
+    )}/ffffff?text=${encodeURIComponent(username || "User")}`;
+  }, [username, theme.colors.primary]);
 
   if (!visible) return null;
 
   return (
-    <FadeInView visible={visible} style={styles.previewCard}>
+    <FadeInView visible={visible} style={[styles.previewCard, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
       <Image
         source={{ uri: photoUri || fallbackUri }}
-        style={styles.previewImage}
+        style={[styles.previewImage, { borderColor: theme.colors.primary }]}
       />
-      <Text style={styles.previewName}>{username || "Username"}</Text>
-      <Text style={styles.previewEmail}>{email || "email@example.com"}</Text>
-      <View style={styles.genrePill}>
-        <Text style={styles.genreText}>
+      <Text style={[styles.previewName, { color: theme.colors.text }]}>
+        {username || "Username"}
+      </Text>
+      <Text style={[styles.previewEmail, { color: theme.colors.textSecondary }]}>
+        {email || "email@example.com"}
+      </Text>
+      <View style={[styles.genrePill, { backgroundColor: theme.colors.accentPill }]}>
+        <Text style={[styles.genreText, { color: theme.colors.primary }]}>
           {genres.length > 0 ? genres.join(", ") : "Genre"}
         </Text>
       </View>
@@ -88,9 +100,12 @@ const ProfilePreview = React.memo(function ProfilePreview({
   );
 });
 
-
 const SpotifyProfile: React.FC = () => {
   const navigation = useNavigation<ProfileNav>();
+
+  // 🟢 get theme from Redux
+  const { mode } = useSelector((state: RootState) => state.theme);
+  const theme = themes[mode];
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -187,18 +202,18 @@ const SpotifyProfile: React.FC = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#000" }}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       behavior={Platform.select({ ios: "padding", android: undefined })}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => navigation.navigate("SpotifyHome")}>
-            <Text style={styles.backBtn}>← Back</Text>
+            <Text style={[styles.backBtn, { color: theme.colors.primary }]}>← Back</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Create Profile 🎤</Text>
+          <Text style={[styles.header, { color: theme.colors.text }]}>Create Profile 🎤</Text>
           <View style={{ width: 60 }} />
         </View>
 
@@ -209,10 +224,14 @@ const SpotifyProfile: React.FC = () => {
           genres={genres}
           photoUri={photoUri}
           visible={previewVisible}
+          theme={theme}
         />
 
-        <TouchableOpacity style={styles.uploadBtn} onPress={pickImage}>
-          <Text style={styles.uploadBtnText}>
+        <TouchableOpacity
+          style={[styles.uploadBtn, { borderColor: theme.colors.primary }]}
+          onPress={pickImage}
+        >
+          <Text style={[styles.uploadBtnText, { color: theme.colors.primary }]}>
             {photoUri ? "Change Photo" : "Upload Photo"}
           </Text>
         </TouchableOpacity>
@@ -220,7 +239,7 @@ const SpotifyProfile: React.FC = () => {
         <View style={{ height: 20 }} />
 
         {/* Username */}
-        <Text style={styles.label}>Username</Text>
+        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Username</Text>
         <Shakeable ref={userRef}>
           <AnimatedInput
             value={username}
@@ -232,13 +251,13 @@ const SpotifyProfile: React.FC = () => {
           />
         </Shakeable>
         <FadeInView visible={!!errUser}>
-          <Text style={styles.errText}>{errUser}</Text>
+          <Text style={[styles.errText, { color: theme.colors.error }]}>{errUser}</Text>
         </FadeInView>
 
         <View style={{ height: 12 }} />
 
         {/* Email */}
-        <Text style={styles.label}>Email</Text>
+        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Email</Text>
         <Shakeable ref={emailRef}>
           <AnimatedInput
             value={email}
@@ -251,13 +270,13 @@ const SpotifyProfile: React.FC = () => {
           />
         </Shakeable>
         <FadeInView visible={!!errEmail}>
-          <Text style={styles.errText}>{errEmail}</Text>
+          <Text style={[styles.errText, { color: theme.colors.error }]}>{errEmail}</Text>
         </FadeInView>
 
         <View style={{ height: 12 }} />
 
         {/* Genre */}
-        <Text style={styles.label}>Favorite Genres</Text>
+        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Favorite Genres</Text>
         <Shakeable ref={genreRef}>
           <View style={styles.genreRow}>
             {GENRES.map((g) => {
@@ -268,14 +287,15 @@ const SpotifyProfile: React.FC = () => {
                   onPress={() => toggleGenre(g)}
                   style={[
                     styles.genreButton,
-                    selected ? styles.genreButtonSelected : undefined,
+                    { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+                    selected && { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
                   ]}
                 >
                   <Text
                     style={
                       selected
-                        ? styles.genreButtonTextSelected
-                        : styles.genreButtonText
+                        ? [styles.genreButtonTextSelected, { color: "#000" }]
+                        : [styles.genreButtonText, { color: theme.colors.text }]
                     }
                   >
                     {g}
@@ -286,12 +306,15 @@ const SpotifyProfile: React.FC = () => {
           </View>
         </Shakeable>
         <FadeInView visible={!!errGenre}>
-          <Text style={styles.errText}>{errGenre}</Text>
+          <Text style={[styles.errText, { color: theme.colors.error }]}>{errGenre}</Text>
         </FadeInView>
 
         <View style={{ height: 30 }} />
 
-        <TouchableOpacity style={styles.submitBtn} onPress={attemptSubmit}>
+        <TouchableOpacity
+          style={[styles.submitBtn, { backgroundColor: theme.colors.primary }]}
+          onPress={attemptSubmit}
+        >
           <Text style={styles.submitBtnText}>Save Profile</Text>
         </TouchableOpacity>
 
@@ -303,13 +326,12 @@ const SpotifyProfile: React.FC = () => {
 
 export default SpotifyProfile;
 
-// --- styles ---
+// --- styles (mostly static, colors replaced dynamically via theme) ---
 const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingTop: 30,
     alignItems: "center",
-    backgroundColor: "#000",
   },
   headerRow: {
     flexDirection: "row",
@@ -319,12 +341,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   backBtn: {
-    color: "#1DB954",
     fontSize: 18,
     fontWeight: "600",
   },
   header: {
-    color: "#fff",
     fontSize: 22,
     fontWeight: "800",
     textAlign: "center",
@@ -334,52 +354,44 @@ const styles = StyleSheet.create({
   // --- Profile Preview ---
   previewCard: {
     width: "100%",
-    backgroundColor: "#121212",
     borderRadius: 16,
     padding: 20,
-    alignItems: "center", // centers content
+    alignItems: "center",
     marginVertical: 14,
     shadowColor: "#000",
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
     borderWidth: 1,
-    borderColor: "#222",
   },
   previewImage: {
-    width: 120, // bigger circle
+    width: 120,
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: "#1DB954",
     marginBottom: 14,
-    shadowColor: "#1DB954",
     shadowOpacity: 0.6,
     shadowRadius: 8,
     elevation: 6,
   },
   previewName: {
-    color: "#fff",
     fontSize: 22,
     fontWeight: "700",
     textAlign: "center",
   },
   previewEmail: {
-    color: "#aaa",
     marginTop: 6,
     fontSize: 15,
     textAlign: "center",
   },
   genrePill: {
     marginTop: 12,
-    backgroundColor: "rgba(29,185,84,0.15)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
     alignSelf: "center",
   },
   genreText: {
-    color: "#1DB954",
     fontWeight: "600",
     fontSize: 13,
   },
@@ -387,7 +399,6 @@ const styles = StyleSheet.create({
   // --- Labels & Errors ---
   label: {
     alignSelf: "flex-start",
-    color: "#bbb",
     marginBottom: 6,
     fontWeight: "700",
     fontSize: 13,
@@ -395,7 +406,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   errText: {
-    color: "#ff6b6b",
     marginTop: 6,
     alignSelf: "flex-start",
   },
@@ -410,32 +420,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "#1a1a1a",
     borderWidth: 1,
-    borderColor: "#333",
     marginRight: 8,
     marginTop: 8,
   },
-  genreButtonSelected: {
-    backgroundColor: "#1DB954",
-    borderColor: "#1DB954",
-  },
   genreButtonText: {
-    color: "#eee",
     fontWeight: "500",
   },
   genreButtonTextSelected: {
-    color: "#000",
     fontWeight: "700",
   },
 
   // --- Buttons ---
   submitBtn: {
-    backgroundColor: "#1DB954",
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 30,
-    shadowColor: "#1DB954",
     shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 6,
@@ -450,17 +450,12 @@ const styles = StyleSheet.create({
   uploadBtn: {
     marginTop: 12,
     marginBottom: 12,
-    backgroundColor: "transparent",
-    borderColor: "#1DB954",
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
   },
   uploadBtnText: {
-    color: "#1DB954",
     fontWeight: "600",
   },
 });
-
-

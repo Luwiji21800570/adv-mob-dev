@@ -13,62 +13,24 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../App";
 
+// 🟢 Redux + Themes
+import { useSelector } from "react-redux";
+import { RootState } from "../src/store";
+import { themes } from "../theme/themes";
+
 // Mock playlists
 const playlists = [
-  {
-    id: 1,
-    title: "Top Hits",
-    type: "music",
-    image: require("../assets/spotifyTopHits.jpg"),
-  },
-  {
-    id: 2,
-    title: "Chill Vibes",
-    type: "music",
-    image: require("../assets/spotifyChill.jpg"),
-  },
-  {
-    id: 3,
-    title: "Workout Mix",
-    type: "music",
-    image: require("../assets/spotifyWorkout.jpg"),
-  },
-  {
-    id: 4,
-    title: "Party Time",
-    type: "music",
-    image: require("../assets/spotifyParty.jpg"),
-  },
-  {
-    id: 5,
-    title: "Daily News",
-    type: "podcasts",
-    image: require("../assets/spotifyPodcast1.jpg"),
-  },
-  {
-    id: 6,
-    title: "Motivation Talks",
-    type: "podcasts",
-    image: require("../assets/spotifyPodcast2.jpg"),
-  },
-  {
-    id: 7,
-    title: "Jazz Classics",
-    type: "music",
-    image: require("../assets/spotifyJazz.jpg"),
-  },
-  {
-    id: 8,
-    title: "Indie Essentials",
-    type: "music",
-    image: require("../assets/spotifyIndie.jpg"),
-  },
+  { id: 1, title: "Top Hits", type: "music", image: require("../assets/spotifyTopHits.jpg") },
+  { id: 2, title: "Chill Vibes", type: "music", image: require("../assets/spotifyChill.jpg") },
+  { id: 3, title: "Workout Mix", type: "music", image: require("../assets/spotifyWorkout.jpg") },
+  { id: 4, title: "Party Time", type: "music", image: require("../assets/spotifyParty.jpg") },
+  { id: 5, title: "Daily News", type: "podcasts", image: require("../assets/spotifyPodcast1.jpg") },
+  { id: 6, title: "Motivation Talks", type: "podcasts", image: require("../assets/spotifyPodcast2.jpg") },
+  { id: 7, title: "Jazz Classics", type: "music", image: require("../assets/spotifyJazz.jpg") },
+  { id: 8, title: "Indie Essentials", type: "music", image: require("../assets/spotifyIndie.jpg") },
 ];
 
-type HomeScreenNav = NativeStackNavigationProp<
-  RootStackParamList,
-  "SpotifyHome"
->;
+type HomeScreenNav = NativeStackNavigationProp<RootStackParamList, "SpotifyHome">;
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -77,6 +39,10 @@ const SpotifyHome: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [filter, setFilter] = useState<"all" | "music" | "podcasts">("all");
   const slideAnim = useRef(new Animated.Value(-SCREEN_WIDTH)).current;
+
+  // 🟢 Get theme from Redux
+  const { mode } = useSelector((state: RootState) => state.theme);
+  const theme = themes[mode];
 
   const toggleDrawer = () => {
     if (drawerOpen) {
@@ -96,18 +62,21 @@ const SpotifyHome: React.FC = () => {
   };
 
   const filteredPlaylists =
-    filter === "all"
-      ? playlists
-      : playlists.filter((pl) => pl.type === filter);
+    filter === "all" ? playlists : playlists.filter((pl) => pl.type === filter);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.navBtn} onPress={toggleDrawer}>
+        <TouchableOpacity
+          style={[styles.navBtn, { backgroundColor: theme.colors.primary }]}
+          onPress={toggleDrawer}
+        >
           <Text style={styles.navBtnText}>☰</Text>
         </TouchableOpacity>
-        <Text style={styles.headerText}>Good Evening 🎶</Text>
+        <Text style={[styles.headerText, { color: theme.colors.text }]}>
+          Good Evening 🎶
+        </Text>
       </View>
 
       {/* FILTER TABS */}
@@ -115,11 +84,19 @@ const SpotifyHome: React.FC = () => {
         {["all", "music", "podcasts"].map((f) => (
           <TouchableOpacity
             key={f}
-            style={[styles.filterBtn, filter === f && styles.filterBtnActive]}
+            style={[
+              styles.filterBtn,
+              { backgroundColor: theme.colors.card },
+              filter === f && { backgroundColor: theme.colors.primary },
+            ]}
             onPress={() => setFilter(f as "all" | "music" | "podcasts")}
           >
             <Text
-              style={[styles.filterText, filter === f && styles.filterTextActive]}
+              style={[
+                styles.filterText,
+                { color: theme.colors.textSecondary },
+                filter === f && { color: theme.colors.text },
+              ]}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </Text>
@@ -133,29 +110,34 @@ const SpotifyHome: React.FC = () => {
           {filteredPlaylists.map((pl) => (
             <TouchableOpacity
               key={pl.id}
-              style={styles.playlistCard}
+              style={[styles.playlistCard, { backgroundColor: theme.colors.card }]}
               onPress={() => navigation.navigate("Playlist", { playlist: pl })}
             >
               <Image source={pl.image} style={styles.playlistImage} />
-              <Text style={styles.playlistTitle}>{pl.title}</Text>
+              <Text style={[styles.playlistTitle, { color: theme.colors.text }]}>
+                {pl.title}
+              </Text>
             </TouchableOpacity>
           ))}
-
         </View>
       </ScrollView>
 
       {/* MINI PLAYER */}
-      <View style={styles.player}>
+      <View style={[styles.player, { backgroundColor: theme.colors.card }]}>
         <Image
           source={require("../assets/spotify.jpg")}
           style={styles.playerImage}
         />
         <View style={{ flex: 1 }}>
-          <Text style={styles.songTitle}>Song Name</Text>
-          <Text style={styles.songArtist}>Artist</Text>
+          <Text style={[styles.songTitle, { color: theme.colors.text }]}>
+            Song Name
+          </Text>
+          <Text style={[styles.songArtist, { color: theme.colors.textSecondary }]}>
+            Artist
+          </Text>
         </View>
         <TouchableOpacity>
-          <Text style={styles.playBtn}>▶️</Text>
+          <Text style={[styles.playBtn, { color: theme.colors.primary }]}>▶️</Text>
         </TouchableOpacity>
       </View>
 
@@ -170,18 +152,25 @@ const SpotifyHome: React.FC = () => {
 
       {/* DRAWER */}
       <Animated.View
-        style={[styles.drawer, { transform: [{ translateX: slideAnim }] }]}
+        style={[
+          styles.drawer,
+          { backgroundColor: theme.colors.card, transform: [{ translateX: slideAnim }] },
+        ]}
       >
         <View style={styles.drawerHeader}>
           <Image
             source={require("../assets/rin.jpg")}
-            style={styles.drawerProfilePic}
+            style={[styles.drawerProfilePic, { borderColor: theme.colors.primary }]}
           />
-          <Text style={styles.drawerName}>Looweji</Text>
-          <Text style={styles.drawerSubtitle}>Premium User</Text>
+          <Text style={[styles.drawerName, { color: theme.colors.text }]}>
+            Looweji
+          </Text>
+          <Text style={[styles.drawerSubtitle, { color: theme.colors.textSecondary }]}>
+            Premium User
+          </Text>
         </View>
 
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
 
         <TouchableOpacity
           style={styles.drawerItem}
@@ -191,7 +180,9 @@ const SpotifyHome: React.FC = () => {
           }}
         >
           <Text style={styles.drawerIcon}>👤</Text>
-          <Text style={styles.drawerText}>Profile</Text>
+          <Text style={[styles.drawerText, { color: theme.colors.text }]}>
+            Profile
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -202,10 +193,12 @@ const SpotifyHome: React.FC = () => {
           }}
         >
           <Text style={styles.drawerIcon}>⚙️</Text>
-          <Text style={styles.drawerText}>Settings</Text>
+          <Text style={[styles.drawerText, { color: theme.colors.text }]}>
+            Settings
+          </Text>
         </TouchableOpacity>
 
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
 
         <TouchableOpacity
           style={[styles.drawerItem, { marginTop: "auto" }]}
@@ -215,7 +208,9 @@ const SpotifyHome: React.FC = () => {
           }}
         >
           <Text style={styles.drawerIcon}>🚪</Text>
-          <Text style={[styles.drawerText, { color: "#E74C3C" }]}>Logout</Text>
+          <Text style={[styles.drawerText, { color: theme.colors.error }]}>
+            Logout
+          </Text>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -227,7 +222,6 @@ export default SpotifyHome;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
   },
   header: {
     padding: 20,
@@ -235,7 +229,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   navBtn: {
-    backgroundColor: "#1DB954",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
@@ -247,7 +240,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   headerText: {
-    color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
   },
@@ -260,19 +252,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    backgroundColor: "#222",
     marginRight: 10,
   },
-  filterBtnActive: {
-    backgroundColor: "#1DB954",
-  },
   filterText: {
-    color: "#aaa",
     fontSize: 14,
     fontWeight: "600",
-  },
-  filterTextActive: {
-    color: "#fff",
   },
   scroll: {
     paddingHorizontal: 15,
@@ -285,7 +269,6 @@ const styles = StyleSheet.create({
   },
   playlistCard: {
     width: "48%",
-    backgroundColor: "#111",
     marginBottom: 15,
     borderRadius: 10,
     overflow: "hidden",
@@ -295,7 +278,6 @@ const styles = StyleSheet.create({
     height: 120,
   },
   playlistTitle: {
-    color: "#fff",
     padding: 10,
     fontWeight: "600",
     fontSize: 14,
@@ -303,14 +285,8 @@ const styles = StyleSheet.create({
   player: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#111",
     padding: 12,
     borderTopWidth: 1,
-    borderTopColor: "#222",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
   playerImage: {
     width: 50,
@@ -319,16 +295,13 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   songTitle: {
-    color: "#fff",
     fontWeight: "bold",
   },
   songArtist: {
-    color: "#888",
     fontSize: 12,
   },
   playBtn: {
     fontSize: 28,
-    color: "#1DB954",
     marginLeft: 10,
   },
   drawer: {
@@ -337,7 +310,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     width: SCREEN_WIDTH * 0.7,
-    backgroundColor: "#111",
     padding: 20,
     zIndex: 10,
   },
@@ -360,20 +332,16 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     marginBottom: 10,
     borderWidth: 3,
-    borderColor: "#1DB954",
   },
   drawerName: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
   drawerSubtitle: {
-    color: "#888",
     fontSize: 12,
   },
   divider: {
     height: 1,
-    backgroundColor: "#333",
     marginVertical: 15,
   },
   drawerItem: {
@@ -386,7 +354,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   drawerText: {
-    color: "#fff",
     fontSize: 16,
   },
 });

@@ -9,51 +9,78 @@ import {
   Image,
   ScrollView,
 } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../src/store";
+import { themes } from "../theme/themes.ts";
 
 interface Props {
   navigation?: any;
 }
 
 const Spotify: React.FC<Props> = ({ navigation }) => {
+  const { mode } = useSelector((state: RootState) => state.theme);
+  const theme = themes[mode];
+
   return (
-    <LinearGradient colors={["#222222", "#000000"]} style={styles.gradient}>
+    <LinearGradient
+      colors={[theme.colors.background, theme.colors.background]}
+      style={styles.gradient}
+    >
       <ScrollView contentContainerStyle={styles.container}>
         <Image
           source={require("../assets/spotify.jpg")}
           style={styles.logo}
           accessibilityLabel="Spotify logo"
         />
-        <Text style={styles.title}>Spotify</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>Spotify</Text>
         <View style={styles.form}>
           <TextInput
             placeholder="Username"
-            placeholderTextColor="#888"
-            style={styles.input}
+            placeholderTextColor={theme.colors.textSecondary}
+            style={[
+              styles.input,
+              { backgroundColor: theme.colors.card, color: theme.colors.text },
+            ]}
             accessibilityLabel="Enter your username"
           />
           <TextInput
             placeholder="Password"
-            placeholderTextColor="#888"
+            placeholderTextColor={theme.colors.textSecondary}
             secureTextEntry
-            style={styles.input}
+            style={[
+              styles.input,
+              { backgroundColor: theme.colors.card, color: theme.colors.text },
+            ]}
             accessibilityLabel="Enter your password"
           />
-          <Text style={styles.forgot}>Forgot password?</Text>
+          <Text style={[styles.forgot, { color: theme.colors.textSecondary }]}>
+            Forgot password?
+          </Text>
 
           <TouchableOpacity
-            style={styles.mainButton}
+            style={[styles.mainButton, { backgroundColor: theme.colors.primary }]}
             onPress={() => navigation?.navigate("SpotifyHome")}
           >
             <Text style={styles.mainButtonText}>Sign In</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.or, styles.orGreen]}>Be Correct With</Text>
+          <Text style={[styles.or, { color: theme.colors.primary }]}>
+            Be Correct With
+          </Text>
           <View style={styles.socialRow}>
-            <TouchableOpacity style={styles.socialBtn}>
-              <Text style={styles.socialText}>f</Text>
+            <TouchableOpacity
+              style={[styles.socialBtn, { backgroundColor: theme.colors.card }]}
+            >
+              <Text style={[styles.socialText, { color: theme.colors.text }]}>
+                f
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialBtn}>
-              <Text style={styles.socialText}>G</Text>
+            <TouchableOpacity
+              style={[styles.socialBtn, { backgroundColor: theme.colors.card }]}
+            >
+              <Text style={[styles.socialText, { color: theme.colors.text }]}>
+                G
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -61,9 +88,9 @@ const Spotify: React.FC<Props> = ({ navigation }) => {
             style={{ marginTop: 20 }}
             onPress={() => navigation?.navigate("SpotifySignUp")}
           >
-            <Text style={{ textAlign: "center", color: "#888" }}>
+            <Text style={{ textAlign: "center", color: theme.colors.textSecondary }}>
               Don’t have an account?{" "}
-              <Text style={{ color: "#1DB954", fontWeight: "bold" }}>
+              <Text style={{ color: theme.colors.primary, fontWeight: "bold" }}>
                 Sign Up
               </Text>
             </Text>
@@ -95,26 +122,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
     marginBottom: 25,
   },
   form: {
     width: "100%",
   },
   input: {
-    backgroundColor: "#111",
-    color: "#fff",
     borderRadius: 8,
     padding: 12,
     marginVertical: 8,
+    fontSize: 14,
   },
   forgot: {
-    color: "#888",
     textAlign: "right",
     marginBottom: 12,
   },
   mainButton: {
-    backgroundColor: "#1DB954",
     padding: 15,
     borderRadius: 30,
     marginVertical: 10,
@@ -122,16 +145,12 @@ const styles = StyleSheet.create({
   mainButtonText: {
     textAlign: "center",
     fontWeight: "bold",
-    color: "#fff",
+    color: "#fff", // keep white for contrast
     fontSize: 16,
   },
   or: {
-    color: "#888",
     textAlign: "center",
     marginVertical: 15,
-  },
-  orGreen: {
-    color: "#1DB954",
     fontWeight: "bold",
   },
   socialRow: {
@@ -139,7 +158,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   socialBtn: {
-    backgroundColor: "#222",
     padding: 12,
     borderRadius: 50,
     marginHorizontal: 10,
@@ -149,7 +167,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   socialText: {
-    color: "#fff",
     fontSize: 20,
   },
 });

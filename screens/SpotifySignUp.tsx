@@ -9,86 +9,136 @@ import {
   Image,
   ScrollView,
 } from "react-native";
+import { useSelector } from "react-redux";
+import { RootState } from "../src/store";
+import { themes } from "../theme/themes.ts";
 
 interface Props {
   navigation?: any;
 }
 
 const SpotifySignUp: React.FC<Props> = ({ navigation }) => {
+  const { mode } = useSelector((state: RootState) => state.theme);
+  const theme = themes[mode];
+
   return (
-    <LinearGradient colors={["#222222", "#000000"]} style={styles.gradient}>
+    <LinearGradient
+      colors={[theme.colors.background, theme.colors.background]}
+      style={styles.gradient}
+    >
       <ScrollView contentContainerStyle={styles.container}>
         <Image
           source={require("../assets/spotify.jpg")}
           style={styles.logo}
           accessibilityLabel="Spotify logo"
         />
-        <Text style={styles.title}>Spotify</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          Spotify
+        </Text>
 
         <View style={styles.form}>
           <TextInput
             placeholder="Email Address"
-            placeholderTextColor="#888"
-            style={styles.input}
+            placeholderTextColor={theme.colors.textSecondary}
+            style={[
+              styles.input,
+              { backgroundColor: theme.colors.card, color: theme.colors.text },
+            ]}
             keyboardType="email-address"
           />
 
           <TextInput
             placeholder="Full Name"
-            placeholderTextColor="#888"
-            style={styles.input}
+            placeholderTextColor={theme.colors.textSecondary}
+            style={[
+              styles.input,
+              { backgroundColor: theme.colors.card, color: theme.colors.text },
+            ]}
           />
 
           <TextInput
             placeholder="Password"
-            placeholderTextColor="#888"
+            placeholderTextColor={theme.colors.textSecondary}
             secureTextEntry
-            style={styles.input}
+            style={[
+              styles.input,
+              { backgroundColor: theme.colors.card, color: theme.colors.text },
+            ]}
           />
 
           <View style={styles.row}>
-            <Text style={styles.labelGreen}>Date of Birth:</Text>
+            <Text style={[styles.labelGreen, { color: theme.colors.primary }]}>
+              Date of Birth:
+            </Text>
             <TextInput
               placeholder="DD"
-              placeholderTextColor="#888"
-              style={[styles.input, styles.dateInput]}
+              placeholderTextColor={theme.colors.textSecondary}
+              style={[
+                styles.input,
+                styles.dateInput,
+                { backgroundColor: theme.colors.card, color: theme.colors.text },
+              ]}
               keyboardType="numeric"
             />
             <TextInput
               placeholder="MM"
-              placeholderTextColor="#888"
-              style={[styles.input, styles.dateInput]}
+              placeholderTextColor={theme.colors.textSecondary}
+              style={[
+                styles.input,
+                styles.dateInput,
+                { backgroundColor: theme.colors.card, color: theme.colors.text },
+              ]}
               keyboardType="numeric"
             />
             <TextInput
               placeholder="YY"
-              placeholderTextColor="#888"
-              style={[styles.input, styles.dateInput]}
+              placeholderTextColor={theme.colors.textSecondary}
+              style={[
+                styles.input,
+                styles.dateInput,
+                { backgroundColor: theme.colors.card, color: theme.colors.text },
+              ]}
               keyboardType="numeric"
             />
           </View>
 
           <View style={styles.row}>
-            <TouchableOpacity style={styles.genderBtn}>
-              <Text style={styles.genderTextGreen}>Male</Text>
+            <TouchableOpacity
+              style={[styles.genderBtn, { backgroundColor: theme.colors.card }]}
+            >
+              <Text style={{ color: theme.colors.primary }}>Male</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.genderBtn}>
-              <Text style={styles.genderTextGreen}>Female</Text>
+            <TouchableOpacity
+              style={[styles.genderBtn, { backgroundColor: theme.colors.card }]}
+            >
+              <Text style={{ color: theme.colors.primary }}>Female</Text>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.mainButton}>
+          <TouchableOpacity
+            style={[styles.mainButton, { backgroundColor: theme.colors.primary }]}
+          >
             <Text style={styles.mainButtonText}>Sign Up</Text>
           </TouchableOpacity>
 
-          <Text style={[styles.or, styles.orGreen]}>Sign up with</Text>
+          <Text style={[styles.or, { color: theme.colors.primary }]}>
+            Sign up with
+          </Text>
 
           <View style={styles.socialRow}>
-            <TouchableOpacity style={styles.socialBtn}>
-              <Text style={styles.socialText}>f</Text>
+            <TouchableOpacity
+              style={[styles.socialBtn, { backgroundColor: theme.colors.card }]}
+            >
+              <Text style={[styles.socialText, { color: theme.colors.text }]}>
+                f
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialBtn}>
-              <Text style={styles.socialText}>G</Text>
+            <TouchableOpacity
+              style={[styles.socialBtn, { backgroundColor: theme.colors.card }]}
+            >
+              <Text style={[styles.socialText, { color: theme.colors.text }]}>
+                G
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -96,9 +146,9 @@ const SpotifySignUp: React.FC<Props> = ({ navigation }) => {
             style={{ marginTop: 20 }}
             onPress={() => navigation?.navigate("Spotify")}
           >
-            <Text style={{ textAlign: "center", color: "#888" }}>
+            <Text style={{ textAlign: "center", color: theme.colors.textSecondary }}>
               Already have an account?{" "}
-              <Text style={{ color: "#1DB954", fontWeight: "bold" }}>
+              <Text style={{ color: theme.colors.primary, fontWeight: "bold" }}>
                 Sign In
               </Text>
             </Text>
@@ -120,14 +170,13 @@ const styles = StyleSheet.create({
     padding: 25,
   },
   logo: { width: 90, height: 90, marginBottom: 15, borderRadius: 50 },
-  title: { fontSize: 28, fontWeight: "bold", color: "#fff", marginBottom: 25 },
+  title: { fontSize: 28, fontWeight: "bold", marginBottom: 25 },
   form: { width: "100%" },
   input: {
-    backgroundColor: "#111",
-    color: "#fff",
     borderRadius: 8,
     padding: 12,
     marginVertical: 8,
+    fontSize: 14,
   },
   dateInput: { flex: 1, marginHorizontal: 5 },
   row: {
@@ -138,15 +187,12 @@ const styles = StyleSheet.create({
   },
   genderBtn: {
     flex: 1,
-    backgroundColor: "#111",
     padding: 12,
     borderRadius: 8,
     marginHorizontal: 5,
     alignItems: "center",
   },
-  genderTextGreen: { color: "#1DB954" },
   mainButton: {
-    backgroundColor: "#1DB954",
     padding: 15,
     borderRadius: 30,
     marginVertical: 10,
@@ -154,14 +200,12 @@ const styles = StyleSheet.create({
   mainButtonText: {
     textAlign: "center",
     fontWeight: "bold",
-    color: "#fff",
+    color: "#fff", // keep white for contrast
     fontSize: 16,
   },
-  or: { color: "#888", textAlign: "center", marginVertical: 15 },
-  orGreen: { color: "#1DB954", fontWeight: "bold" },
+  or: { textAlign: "center", marginVertical: 15, fontWeight: "bold" },
   socialRow: { flexDirection: "row", justifyContent: "center" },
   socialBtn: {
-    backgroundColor: "#222",
     padding: 12,
     borderRadius: 50,
     marginHorizontal: 10,
@@ -170,6 +214,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  socialText: { color: "#fff", fontSize: 20 },
-  labelGreen: { color: "#1DB954", marginTop: 10, marginBottom: 5 },
+  socialText: { fontSize: 20 },
+  labelGreen: { marginTop: 10, marginBottom: 5 },
 });

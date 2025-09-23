@@ -11,6 +11,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
+// ✅ redux theme
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import { themes } from "../theme/themes";
+
 type Song = {
   id: string;
   title: string;
@@ -74,6 +79,10 @@ const PlaylistScreen: React.FC = () => {
   const route = useRoute<any>();
   const { playlist } = route.params;
 
+  // ✅ theme
+  const { mode } = useSelector((state: RootState) => state.theme);
+  const theme = themes[mode];
+
   const [state, dispatch] = useReducer(playlistReducer, {
     past: [],
     present: [],
@@ -128,35 +137,58 @@ const PlaylistScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {/* Back Button */}
       <TouchableOpacity
         style={styles.backBtn}
         onPress={() => navigation.goBack()}
       >
-        <Text style={styles.backText}>← Back</Text>
+        <Text style={[styles.backText, { color: theme.colors.primary }]}>
+          ← Back
+        </Text>
       </TouchableOpacity>
 
       {/* Playlist Title */}
-      <Text style={styles.title}>{playlist.title}</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        {playlist.title}
+      </Text>
 
       {/* Add Song */}
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+              color: theme.colors.text,
+            },
+          ]}
           placeholder="Song Title"
-          placeholderTextColor="#888"
+          placeholderTextColor={theme.colors.placeholder}
           value={newSongTitle}
           onChangeText={setNewSongTitle}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
+              color: theme.colors.text,
+            },
+          ]}
           placeholder="YouTube Link"
-          placeholderTextColor="#888"
+          placeholderTextColor={theme.colors.placeholder}
           value={newSongUrl}
           onChangeText={setNewSongUrl}
         />
-        <TouchableOpacity style={styles.addBtn} onPress={addSong}>
+        <TouchableOpacity
+          style={[styles.addBtn, { backgroundColor: theme.colors.primary }]}
+          onPress={addSong}
+        >
           <Text style={styles.addBtnText}>＋ Add Song</Text>
         </TouchableOpacity>
       </View>
@@ -164,13 +196,19 @@ const PlaylistScreen: React.FC = () => {
       {/* Controls */}
       <View style={styles.controls}>
         <TouchableOpacity onPress={() => dispatch({ type: "UNDO" })}>
-          <Text style={styles.controlText}>⟲ Undo</Text>
+          <Text style={[styles.controlText, { color: theme.colors.primary }]}>
+            ⟲ Undo
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => dispatch({ type: "REDO" })}>
-          <Text style={styles.controlText}>⟳ Redo</Text>
+          <Text style={[styles.controlText, { color: theme.colors.primary }]}>
+            ⟳ Redo
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => dispatch({ type: "CLEAR" })}>
-          <Text style={[styles.controlText, { color: "#E74C3C" }]}>✖ Clear</Text>
+          <Text style={[styles.controlText, { color: "#E74C3C" }]}>
+            ✖ Clear
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -180,10 +218,15 @@ const PlaylistScreen: React.FC = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.songItem}
+            style={[
+              styles.songItem,
+              { backgroundColor: theme.colors.card },
+            ]}
             onPress={() => playSong(item.url)}
           >
-            <Text style={styles.songText}>{item.title}</Text>
+            <Text style={[styles.songText, { color: theme.colors.text }]}>
+              {item.title}
+            </Text>
             <TouchableOpacity
               onPress={() => dispatch({ type: "REMOVE", id: item.id })}
             >
@@ -192,13 +235,20 @@ const PlaylistScreen: React.FC = () => {
           </TouchableOpacity>
         )}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No songs yet. Add one!</Text>
+          <Text style={[styles.emptyText, { color: theme.colors.placeholder }]}>
+            No songs yet. Add one!
+          </Text>
         }
       />
 
       {/* YouTube Player */}
       {playingVideoId && (
-        <View style={styles.playerContainer}>
+        <View
+          style={[
+            styles.playerContainer,
+            { borderColor: theme.colors.border },
+          ]}
+        >
           <YoutubePlayer
             height={230}
             play={true}
@@ -216,23 +266,19 @@ const PlaylistScreen: React.FC = () => {
 export default PlaylistScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#000", padding: 20 },
+  container: { flex: 1, padding: 20 },
   backBtn: { marginBottom: 15 },
-  backText: { color: "#1DB954", fontSize: 16, fontWeight: "600" },
-  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20, color: "#fff" },
+  backText: { fontSize: 16, fontWeight: "600" },
+  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20 },
   inputContainer: { marginBottom: 20 },
   input: {
     borderWidth: 1,
-    borderColor: "#222",
-    backgroundColor: "#111",
-    color: "#fff",
     padding: 12,
     marginBottom: 10,
     borderRadius: 8,
     fontSize: 14,
   },
   addBtn: {
-    backgroundColor: "#1DB954",
     paddingVertical: 12,
     borderRadius: 30,
     alignItems: "center",
@@ -243,24 +289,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     marginBottom: 15,
   },
-  controlText: { color: "#1DB954", fontSize: 16, fontWeight: "600" },
+  controlText: { fontSize: 16, fontWeight: "600" },
   songItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#111",
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
   },
-  songText: { color: "#fff", fontSize: 16, fontWeight: "500" },
+  songText: { fontSize: 16, fontWeight: "500" },
   deleteBtn: { fontSize: 18, color: "#E74C3C" },
-  emptyText: { textAlign: "center", color: "#888", marginTop: 20 },
+  emptyText: { textAlign: "center", marginTop: 20 },
   playerContainer: {
     marginTop: 20,
     borderRadius: 12,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#222",
   },
 });
