@@ -11,6 +11,13 @@
 ![Screenshot 12](./screenshots/spot12.jpg)
 ![Screenshot 9](./screenshots/spot9.jpg)
 ![Screenshot 13](./screenshots/spot13.jpg)
+=================WEEK 5 ACTIVITY 1=================
+![Screenshot 14](./screenshots/spot14.jpg)
+![Screenshot 15](./screenshots/spot15.jpg)
+![Screenshot 16](./screenshots/spot16.jpg)
+![Screenshot 17](./screenshots/spot17.jpg)
+
+
 
 
 
