@@ -20,6 +20,9 @@
 ![Screenshot 15](./screenshots/spot15.jpg)
 ![Screenshot 16](./screenshots/spot16.jpg)
 ![Screenshot 17](./screenshots/spot17.jpg)
+![Screenshot 18](./screenshots/spot18.jpg)
+![Screenshot 19](./screenshots/spot19.jpg)
+
 
 
 
