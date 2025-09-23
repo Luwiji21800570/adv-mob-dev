@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Modal,
+  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import YoutubePlayer from "react-native-youtube-iframe";
@@ -92,6 +94,7 @@ const PlaylistScreen: React.FC = () => {
   const [newSongTitle, setNewSongTitle] = useState("");
   const [newSongUrl, setNewSongUrl] = useState("");
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const storageKey = `playlist_${playlist.id}_songs`;
 
@@ -120,6 +123,7 @@ const PlaylistScreen: React.FC = () => {
     dispatch({ type: "ADD", song: newSong });
     setNewSongTitle("");
     setNewSongUrl("");
+    setModalVisible(false);
   };
 
   const extractVideoId = (url: string): string | null => {
@@ -140,93 +144,76 @@ const PlaylistScreen: React.FC = () => {
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backBtn}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={[styles.backText, { color: theme.colors.primary }]}>
-          ← Back
-        </Text>
-      </TouchableOpacity>
-
-      {/* Playlist Title */}
-      <Text style={[styles.title, { color: theme.colors.text }]}>
-        {playlist.title}
-      </Text>
-
-      {/* Add Song */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              color: theme.colors.text,
-            },
-          ]}
-          placeholder="Song Title"
-          placeholderTextColor={theme.colors.placeholder}
-          value={newSongTitle}
-          onChangeText={setNewSongTitle}
-        />
-        <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              color: theme.colors.text,
-            },
-          ]}
-          placeholder="YouTube Link"
-          placeholderTextColor={theme.colors.placeholder}
-          value={newSongUrl}
-          onChangeText={setNewSongUrl}
-        />
+      {/* HEADER with cover */}
+      <View style={styles.header}>
+        {/* ✅ Back Button */}
         <TouchableOpacity
-          style={[styles.addBtn, { backgroundColor: theme.colors.primary }]}
-          onPress={addSong}
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
         >
-          <Text style={styles.addBtnText}>＋ Add Song</Text>
+          <Text style={[styles.backText, { color: theme.colors.primary }]}>
+            ← Back
+          </Text>
         </TouchableOpacity>
+
+        <Image
+          source={playlist.image || require("../assets/spotify.jpg")}
+          style={styles.coverImage}
+        />
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          {playlist.title}
+        </Text>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+          {state.present.length} songs
+        </Text>
+
+        {/* Controls: Play, Undo/Redo */}
+        <View style={styles.headerControls}>
+          <TouchableOpacity
+            style={[styles.playBtn, { backgroundColor: theme.colors.primary }]}
+            onPress={() => {
+              if (state.present[0]) playSong(state.present[0].url);
+            }}
+          >
+            <Text style={styles.playBtnText}>▶ Play</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => dispatch({ type: "UNDO" })}>
+            <Text style={[styles.controlText, { color: theme.colors.primary }]}>
+              ⟲
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => dispatch({ type: "REDO" })}>
+            <Text style={[styles.controlText, { color: theme.colors.primary }]}>
+              ⟳
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => dispatch({ type: "CLEAR" })}>
+            <Text style={[styles.controlText, { color: "#E74C3C" }]}>✖</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Controls */}
-      <View style={styles.controls}>
-        <TouchableOpacity onPress={() => dispatch({ type: "UNDO" })}>
-          <Text style={[styles.controlText, { color: theme.colors.primary }]}>
-            ⟲ Undo
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => dispatch({ type: "REDO" })}>
-          <Text style={[styles.controlText, { color: theme.colors.primary }]}>
-            ⟳ Redo
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => dispatch({ type: "CLEAR" })}>
-          <Text style={[styles.controlText, { color: "#E74C3C" }]}>
-            ✖ Clear
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Songs */}
+      {/* Song List */}
       <FlatList
         data={state.present}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 100 }}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={[
-              styles.songItem,
-              { backgroundColor: theme.colors.card },
-            ]}
+            style={[styles.songItem, { backgroundColor: theme.colors.card }]}
             onPress={() => playSong(item.url)}
           >
-            <Text style={[styles.songText, { color: theme.colors.text }]}>
-              {item.title}
-            </Text>
+            <View>
+              <Text style={[styles.songTitle, { color: theme.colors.text }]}>
+                {item.title}
+              </Text>
+              <Text
+                style={[styles.songSub, { color: theme.colors.textSecondary }]}
+                numberOfLines={1}
+              >
+                {item.url}
+              </Text>
+            </View>
             <TouchableOpacity
               onPress={() => dispatch({ type: "REMOVE", id: item.id })}
             >
@@ -241,16 +228,58 @@ const PlaylistScreen: React.FC = () => {
         }
       />
 
-      {/* YouTube Player */}
+      {/* Floating Add Button */}
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.fabText}>＋</Text>
+      </TouchableOpacity>
+
+      {/* Modal for adding a song */}
+      <Modal transparent visible={modalVisible} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View
+            style={[styles.modalContent, { backgroundColor: theme.colors.card }]}
+          >
+            <TextInput
+              style={[styles.input, { color: theme.colors.text }]}
+              placeholder="Song Title"
+              placeholderTextColor={theme.colors.placeholder}
+              value={newSongTitle}
+              onChangeText={setNewSongTitle}
+            />
+            <TextInput
+              style={[styles.input, { color: theme.colors.text }]}
+              placeholder="YouTube Link"
+              placeholderTextColor={theme.colors.placeholder}
+              value={newSongUrl}
+              onChangeText={setNewSongUrl}
+            />
+            <TouchableOpacity
+              style={[styles.addBtn, { backgroundColor: theme.colors.primary }]}
+              onPress={addSong}
+            >
+              <Text style={styles.addBtnText}>Add Song</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text
+                style={[styles.cancelText, { color: theme.colors.primary }]}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Sticky YouTube Player */}
       {playingVideoId && (
         <View
-          style={[
-            styles.playerContainer,
-            { borderColor: theme.colors.border },
-          ]}
+          style={[styles.playerContainer, { borderColor: theme.colors.border }]}
         >
           <YoutubePlayer
-            height={230}
+            height={90}
             play={true}
             videoId={playingVideoId}
             onChangeState={(state) => {
@@ -266,45 +295,96 @@ const PlaylistScreen: React.FC = () => {
 export default PlaylistScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  backBtn: { marginBottom: 15 },
-  backText: { fontSize: 16, fontWeight: "600" },
-  title: { fontSize: 26, fontWeight: "bold", marginBottom: 20 },
-  inputContainer: { marginBottom: 20 },
-  input: {
-    borderWidth: 1,
-    padding: 12,
-    marginBottom: 10,
-    borderRadius: 8,
-    fontSize: 14,
+  container: { flex: 1 },
+  header: { alignItems: "center", padding: 20 },
+  backBtn: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    padding: 8,
   },
-  addBtn: {
-    paddingVertical: 12,
-    borderRadius: 30,
-    alignItems: "center",
+  backText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
-  addBtnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
-  controls: {
+  coverImage: { width: 180, height: 180, borderRadius: 10, marginBottom: 15 },
+  title: { fontSize: 26, fontWeight: "bold", textAlign: "center" },
+  subtitle: { fontSize: 14, marginBottom: 15 },
+  headerControls: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 15,
+    alignItems: "center",
+    gap: 15,
+    marginBottom: 10,
   },
-  controlText: { fontSize: 16, fontWeight: "600" },
+  playBtn: {
+    paddingHorizontal: 25,
+    paddingVertical: 10,
+    borderRadius: 30,
+  },
+  playBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  controlText: { fontSize: 20 },
+
+  // Songs
   songItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 15,
     borderRadius: 8,
+    marginHorizontal: 15,
     marginBottom: 10,
   },
-  songText: { fontSize: 16, fontWeight: "500" },
+  songTitle: { fontSize: 16, fontWeight: "600" },
+  songSub: { fontSize: 12 },
   deleteBtn: { fontSize: 18, color: "#E74C3C" },
   emptyText: { textAlign: "center", marginTop: 20 },
-  playerContainer: {
-    marginTop: 20,
+
+  // FAB
+  fab: {
+    position: "absolute",
+    bottom: 90,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+  },
+  fabText: { fontSize: 28, color: "#fff" },
+
+  // Modal
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  modalContent: {
     borderRadius: 12,
-    overflow: "hidden",
-    borderWidth: 1,
+    padding: 20,
+  },
+  input: {
+    borderBottomWidth: 1,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  addBtn: {
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  addBtnText: { color: "#fff", fontWeight: "600" },
+  cancelText: { textAlign: "center", fontSize: 16 },
+
+  // Player
+  playerContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopWidth: 1,
+    backgroundColor: "#000",
   },
 });

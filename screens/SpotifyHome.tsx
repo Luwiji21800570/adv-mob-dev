@@ -37,7 +37,6 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const SpotifyHome: React.FC = () => {
   const navigation = useNavigation<HomeScreenNav>();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [filter, setFilter] = useState<"all" | "music" | "podcasts">("all");
   const slideAnim = useRef(new Animated.Value(-SCREEN_WIDTH)).current;
 
   // 🟢 Get theme from Redux
@@ -61,9 +60,6 @@ const SpotifyHome: React.FC = () => {
     }
   };
 
-  const filteredPlaylists =
-    filter === "all" ? playlists : playlists.filter((pl) => pl.type === filter);
-
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* HEADER */}
@@ -74,52 +70,74 @@ const SpotifyHome: React.FC = () => {
         >
           <Text style={styles.navBtnText}>☰</Text>
         </TouchableOpacity>
-        <Text style={[styles.headerText, { color: theme.colors.text }]}>
-          Good Evening 🎶
+        <Text style={[styles.greeting, { color: theme.colors.text }]}>
+          Good Evening
         </Text>
       </View>
 
-      {/* FILTER TABS */}
-      <View style={styles.filterRow}>
-        {["all", "music", "podcasts"].map((f) => (
-          <TouchableOpacity
-            key={f}
-            style={[
-              styles.filterBtn,
-              { backgroundColor: theme.colors.card },
-              filter === f && { backgroundColor: theme.colors.primary },
-            ]}
-            onPress={() => setFilter(f as "all" | "music" | "podcasts")}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                { color: theme.colors.textSecondary },
-                filter === f && { color: theme.colors.text },
-              ]}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* PLAYLISTS */}
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.playlistGrid}>
-          {filteredPlaylists.map((pl) => (
+      <ScrollView>
+        {/* RECENTLY PLAYED GRID */}
+        <View style={styles.quickGrid}>
+          {playlists.slice(0, 6).map((pl) => (
             <TouchableOpacity
               key={pl.id}
-              style={[styles.playlistCard, { backgroundColor: theme.colors.card }]}
+              style={[styles.quickCard, { backgroundColor: theme.colors.card }]}
               onPress={() => navigation.navigate("Playlist", { playlist: pl })}
             >
-              <Image source={pl.image} style={styles.playlistImage} />
-              <Text style={[styles.playlistTitle, { color: theme.colors.text }]}>
+              <Image source={pl.image} style={styles.quickImage} />
+              <Text
+                numberOfLines={1}
+                style={[styles.quickTitle, { color: theme.colors.text }]}
+              >
                 {pl.title}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* SECTION: MADE FOR YOU */}
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          Made for You
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.carousel}>
+          {playlists.map((pl) => (
+            <TouchableOpacity
+              key={pl.id}
+              style={styles.carouselCard}
+              onPress={() => navigation.navigate("Playlist", { playlist: pl })}
+            >
+              <Image source={pl.image} style={styles.carouselImage} />
+              <Text
+                numberOfLines={1}
+                style={[styles.carouselText, { color: theme.colors.text }]}
+              >
+                {pl.title}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* SECTION: RECOMMENDED */}
+        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+          Recommended for Today
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.carousel}>
+          {playlists.reverse().map((pl) => (
+            <TouchableOpacity
+              key={pl.id}
+              style={styles.carouselCard}
+              onPress={() => navigation.navigate("Playlist", { playlist: pl })}
+            >
+              <Image source={pl.image} style={styles.carouselImage} />
+              <Text
+                numberOfLines={1}
+                style={[styles.carouselText, { color: theme.colors.text }]}
+              >
+                {pl.title}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </ScrollView>
 
       {/* MINI PLAYER */}
@@ -137,7 +155,10 @@ const SpotifyHome: React.FC = () => {
           </Text>
         </View>
         <TouchableOpacity>
-          <Text style={[styles.playBtn, { color: theme.colors.primary }]}>▶️</Text>
+          <Text style={styles.icon}>⏯</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.icon}>⏭</Text>
         </TouchableOpacity>
       </View>
 
@@ -220,13 +241,12 @@ const SpotifyHome: React.FC = () => {
 export default SpotifyHome;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+
   header: {
-    padding: 20,
     flexDirection: "row",
     alignItems: "center",
+    padding: 20,
   },
   navBtn: {
     paddingVertical: 6,
@@ -239,49 +259,43 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 18,
   },
-  headerText: {
-    fontSize: 24,
+  greeting: {
+    fontSize: 22,
     fontWeight: "bold",
   },
-  filterRow: {
-    flexDirection: "row",
-    paddingHorizontal: 15,
-    marginBottom: 10,
-  },
-  filterBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  filterText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  scroll: {
-    paddingHorizontal: 15,
-    paddingBottom: 100,
-  },
-  playlistGrid: {
+
+  // Quick grid
+  quickGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
+    paddingHorizontal: 10,
   },
-  playlistCard: {
+  quickCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 6,
+    marginBottom: 10,
     width: "48%",
-    marginBottom: 15,
-    borderRadius: 10,
     overflow: "hidden",
   },
-  playlistImage: {
-    width: "100%",
-    height: 120,
+  quickImage: { width: 50, height: 50 },
+  quickTitle: { marginLeft: 10, fontWeight: "600", flexShrink: 1 },
+
+  // Sections
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginLeft: 15,
+    marginBottom: 10,
   },
-  playlistTitle: {
-    padding: 10,
-    fontWeight: "600",
-    fontSize: 14,
-  },
+  carousel: { paddingHorizontal: 15 },
+  carouselCard: { marginRight: 15, width: 140 },
+  carouselImage: { width: 140, height: 140, borderRadius: 8 },
+  carouselText: { marginTop: 5, fontWeight: "500" },
+
+  // Player
   player: {
     flexDirection: "row",
     alignItems: "center",
@@ -294,16 +308,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
   },
-  songTitle: {
-    fontWeight: "bold",
-  },
-  songArtist: {
-    fontSize: 12,
-  },
-  playBtn: {
-    fontSize: 28,
-    marginLeft: 10,
-  },
+  songTitle: { fontWeight: "bold" },
+  songArtist: { fontSize: 12 },
+  icon: { fontSize: 20, marginLeft: 10 },
+
+  // Drawer
   drawer: {
     position: "absolute",
     top: 0,
@@ -322,10 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 5,
   },
-  drawerHeader: {
-    alignItems: "center",
-    marginBottom: 30,
-  },
+  drawerHeader: { alignItems: "center", marginBottom: 30 },
   drawerProfilePic: {
     width: 80,
     height: 80,
@@ -333,27 +339,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 3,
   },
-  drawerName: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  drawerSubtitle: {
-    fontSize: 12,
-  },
-  divider: {
-    height: 1,
-    marginVertical: 15,
-  },
-  drawerItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-  },
-  drawerIcon: {
-    fontSize: 18,
-    marginRight: 10,
-  },
-  drawerText: {
-    fontSize: 16,
-  },
+  drawerName: { fontSize: 18, fontWeight: "bold" },
+  drawerSubtitle: { fontSize: 12 },
+  divider: { height: 1, marginVertical: 15 },
+  drawerItem: { flexDirection: "row", alignItems: "center", paddingVertical: 12 },
+  drawerIcon: { fontSize: 18, marginRight: 10 },
+  drawerText: { fontSize: 16 },
 });
