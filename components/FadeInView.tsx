@@ -22,10 +22,14 @@ const FadeInView: React.FC<Props> = ({ visible, children, style }) => {
     opacity: opacity.value,
   }));
 
-  // Don’t render if invisible & fully faded out
-  if (!visible && opacity.value === 0) return null;
-
-  return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
+  return (
+    <Animated.View
+      style={[style, animatedStyle]}
+      pointerEvents={visible ? "auto" : "none"} // 🔑 Don’t block touches when hidden
+    >
+      {children}
+    </Animated.View>
+  );
 };
 
 export default FadeInView;

@@ -8,9 +8,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { PermissionsAndroid } from "react-native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../App";
 import * as ImagePicker from "react-native-image-picker";
@@ -80,7 +82,13 @@ const ProfilePreview = React.memo(function ProfilePreview({
   if (!visible) return null;
 
   return (
-    <FadeInView visible={visible} style={[styles.previewCard, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
+    <FadeInView
+      visible={visible}
+      style={[
+        styles.previewCard,
+        { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
+      ]}
+    >
       <Image
         source={{ uri: photoUri || fallbackUri }}
         style={[styles.previewImage, { borderColor: theme.colors.primary }]}
@@ -88,10 +96,17 @@ const ProfilePreview = React.memo(function ProfilePreview({
       <Text style={[styles.previewName, { color: theme.colors.text }]}>
         {username || "Username"}
       </Text>
-      <Text style={[styles.previewEmail, { color: theme.colors.textSecondary }]}>
+      <Text
+        style={[styles.previewEmail, { color: theme.colors.textSecondary }]}
+      >
         {email || "email@example.com"}
       </Text>
-      <View style={[styles.genrePill, { backgroundColor: theme.colors.accentPill }]}>
+      <View
+        style={[
+          styles.genrePill,
+          { backgroundColor: theme.colors.accentPill },
+        ]}
+      >
         <Text style={[styles.genreText, { color: theme.colors.primary }]}>
           {genres.length > 0 ? genres.join(", ") : "Genre"}
         </Text>
@@ -117,7 +132,11 @@ const SpotifyProfile: React.FC = () => {
   const [errGenre, setErrGenre] = useState("");
 
   const previewVisible = useMemo(
-    () => username.length > 0 || email.length > 0 || genres.length > 0 || !!photoUri,
+    () =>
+      username.length > 0 ||
+      email.length > 0 ||
+      genres.length > 0 ||
+      !!photoUri,
     [username, email, genres, photoUri]
   );
 
@@ -153,7 +172,9 @@ const SpotifyProfile: React.FC = () => {
   useEffect(() => {
     const toSave = { username, email, genres, photoUri };
     const id = setTimeout(() => {
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)).catch(() => null);
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave)).catch(
+        () => null
+      );
     }, 300);
     return () => clearTimeout(id);
   }, [username, email, genres, photoUri]);
@@ -189,139 +210,214 @@ const SpotifyProfile: React.FC = () => {
     );
   };
 
-  const pickImage = () => {
-    ImagePicker.launchImageLibrary(
-      { mediaType: "photo", selectionLimit: 1 },
-      (res) => {
-        if (res.assets && res.assets.length > 0) {
-          setPhotoUri(res.assets[0].uri);
-        }
-      }
-    );
-  };
+const pickImage = () => {
+  console.log("📸 pickImage called");
+  Alert.alert("Upload Photo", "Choose an option", [
+    {
+      text: "Camera",
+      onPress: () => {
+        console.log("📷 Camera pressed");
+        openCamera();
+      },
+    },
+    {
+      text: "Gallery",
+      onPress: () => {
+        console.log("🖼️ Gallery pressed");
+        openGallery();
+      },
+    },
+    { text: "Cancel", style: "cancel", onPress: () => console.log("❌ Cancel pressed") },
+  ]);
+};
 
-  return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-      behavior={Platform.select({ ios: "padding", android: undefined })}
+const openCamera = async () => {
+  console.log("🚀 openCamera start");
+  try {
+    const result = await ImagePicker.launchCamera({
+      mediaType: "photo",
+      includeBase64: false,
+      saveToPhotos: true,
+    });
+    console.log("📷 Camera result:", result);
+    if (result?.assets?.length > 0) {
+      setPhotoUri(result.assets[0].uri);
+    }
+  } catch (err) {
+    console.warn("Camera error:", err);
+  }
+};
+
+const openGallery = async () => {
+  console.log("🚀 openGallery start");
+  try {
+    const result = await ImagePicker.launchImageLibrary({
+      mediaType: "photo",
+      selectionLimit: 1,
+      includeBase64: false,
+    });
+    console.log("🖼️ Gallery result:", result);
+    if (result?.assets?.length > 0) {
+      setPhotoUri(result.assets[0].uri);
+    }
+  } catch (err) {
+    console.warn("Gallery error:", err);
+  }
+};
+
+
+return (
+  <KeyboardAvoidingView
+    style={{ flex: 1, backgroundColor: theme.colors.background }}
+    behavior={Platform.select({ ios: "padding", android: undefined })}
+  >
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: theme.colors.background },
+      ]}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView
-        contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => navigation.navigate("SpotifyHome")}>
-            <Text style={[styles.backBtn, { color: theme.colors.primary }]}>← Back</Text>
-          </TouchableOpacity>
-          <Text style={[styles.header, { color: theme.colors.text }]}>Create Profile 🎤</Text>
-          <View style={{ width: 60 }} />
-        </View>
-
-        {/* live preview */}
-        <ProfilePreview
-          username={username}
-          email={email}
-          genres={genres}
-          photoUri={photoUri}
-          visible={previewVisible}
-          theme={theme}
-        />
-
-        <TouchableOpacity
-          style={[styles.uploadBtn, { borderColor: theme.colors.primary }]}
-          onPress={pickImage}
-        >
-          <Text style={[styles.uploadBtnText, { color: theme.colors.primary }]}>
-            {photoUri ? "Change Photo" : "Upload Photo"}
+      {/* Header Row */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={() => navigation.navigate("SpotifyHome")}>
+          <Text style={[styles.backBtn, { color: theme.colors.primary }]}>
+            ← Back
           </Text>
         </TouchableOpacity>
+        <Text style={[styles.header, { color: theme.colors.text }]}>
+          Create Profile 🎤
+        </Text>
+        <View style={{ width: 60 }} />
+      </View>
 
-        <View style={{ height: 20 }} />
 
-        {/* Username */}
-        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Username</Text>
-        <Shakeable ref={userRef}>
-          <AnimatedInput
-            value={username}
-            onChangeText={setUsername}
-            placeholder="Enter username"
-            autoCapitalize="none"
-            autoCorrect={false}
-            hasError={!!errUser}
-          />
-        </Shakeable>
-        <FadeInView visible={!!errUser}>
-          <Text style={[styles.errText, { color: theme.colors.error }]}>{errUser}</Text>
-        </FadeInView>
+      {/* Live Preview */}
+      <ProfilePreview
+        username={username}
+        email={email}
+        genres={genres}
+        photoUri={photoUri}
+        visible={previewVisible}
+        theme={theme}
+      />
 
-        <View style={{ height: 12 }} />
+      <View style={{ alignItems: "center", marginVertical: 20 }}>
+             <TouchableOpacity
+               style={[styles.uploadBtn, { borderColor: theme.colors.primary }]}
+               onPress={pickImage}
+             >
+               <Text style={[styles.uploadBtnText, { color: theme.colors.primary }]}>
+                 {photoUri ? "Change Photo" : "Upload Photo"}
+               </Text>
+             </TouchableOpacity>
+           </View>
 
-        {/* Email */}
-        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Email</Text>
-        <Shakeable ref={emailRef}>
-          <AnimatedInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="your@email.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            hasError={!!errEmail}
-          />
-        </Shakeable>
-        <FadeInView visible={!!errEmail}>
-          <Text style={[styles.errText, { color: theme.colors.error }]}>{errEmail}</Text>
-        </FadeInView>
+      <View style={{ height: 20 }} />
 
-        <View style={{ height: 12 }} />
+      {/* Username */}
+      <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
+        Username
+      </Text>
+      <Shakeable ref={userRef}>
+        <AnimatedInput
+          value={username}
+          onChangeText={setUsername}
+          placeholder="Enter username"
+          autoCapitalize="none"
+          autoCorrect={false}
+          hasError={!!errUser}
+        />
+      </Shakeable>
+      <FadeInView visible={!!errUser}>
+        <Text style={[styles.errText, { color: theme.colors.error }]}>
+          {errUser}
+        </Text>
+      </FadeInView>
 
-        {/* Genre */}
-        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Favorite Genres</Text>
-        <Shakeable ref={genreRef}>
-          <View style={styles.genreRow}>
-            {GENRES.map((g) => {
-              const selected = genres.includes(g);
-              return (
-                <TouchableOpacity
-                  key={g}
-                  onPress={() => toggleGenre(g)}
-                  style={[
-                    styles.genreButton,
-                    { backgroundColor: theme.colors.card, borderColor: theme.colors.border },
-                    selected && { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
-                  ]}
+      <View style={{ height: 12 }} />
+
+      {/* Email */}
+      <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
+        Email
+      </Text>
+      <Shakeable ref={emailRef}>
+        <AnimatedInput
+          value={email}
+          onChangeText={setEmail}
+          placeholder="your@email.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          hasError={!!errEmail}
+        />
+      </Shakeable>
+      <FadeInView visible={!!errEmail}>
+        <Text style={[styles.errText, { color: theme.colors.error }]}>
+          {errEmail}
+        </Text>
+      </FadeInView>
+
+      <View style={{ height: 12 }} />
+
+      {/* Genre */}
+      <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
+        Favorite Genres
+      </Text>
+      <Shakeable ref={genreRef}>
+        <View style={styles.genreRow}>
+          {GENRES.map((g) => {
+            const selected = genres.includes(g);
+            return (
+              <TouchableOpacity
+                key={g}
+                onPress={() => toggleGenre(g)}
+                style={[
+                  styles.genreButton,
+                  {
+                    backgroundColor: theme.colors.card,
+                    borderColor: theme.colors.border,
+                  },
+                  selected && {
+                    backgroundColor: theme.colors.primary,
+                    borderColor: theme.colors.primary,
+                  },
+                ]}
+              >
+                <Text
+                  style={
+                    selected
+                      ? [styles.genreButtonTextSelected, { color: "#000" }]
+                      : [styles.genreButtonText, { color: theme.colors.text }]
+                  }
                 >
-                  <Text
-                    style={
-                      selected
-                        ? [styles.genreButtonTextSelected, { color: "#000" }]
-                        : [styles.genreButtonText, { color: theme.colors.text }]
-                    }
-                  >
-                    {g}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </Shakeable>
-        <FadeInView visible={!!errGenre}>
-          <Text style={[styles.errText, { color: theme.colors.error }]}>{errGenre}</Text>
-        </FadeInView>
+                  {g}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </Shakeable>
+      <FadeInView visible={!!errGenre}>
+        <Text style={[styles.errText, { color: theme.colors.error }]}>
+          {errGenre}
+        </Text>
+      </FadeInView>
 
-        <View style={{ height: 30 }} />
+      <View style={{ height: 30 }} />
 
-        <TouchableOpacity
-          style={[styles.submitBtn, { backgroundColor: theme.colors.primary }]}
-          onPress={attemptSubmit}
-        >
-          <Text style={styles.submitBtnText}>Save Profile</Text>
-        </TouchableOpacity>
+      {/* Save Profile */}
+      <TouchableOpacity
+        style={[styles.submitBtn, { backgroundColor: theme.colors.primary }]}
+        onPress={attemptSubmit}
+      >
+        <Text style={styles.submitBtnText}>Save Profile</Text>
+      </TouchableOpacity>
 
-        <View style={{ height: 40 }} />
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+      <View style={{ height: 40 }} />
+    </ScrollView>
+  </KeyboardAvoidingView>
+);
 };
 
 export default SpotifyProfile;

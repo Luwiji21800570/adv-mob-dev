@@ -126,13 +126,17 @@ const PlaylistScreen: React.FC = () => {
     setModalVisible(false);
   };
 
+  // ✅ improved regex for all YouTube URL formats
   const extractVideoId = (url: string): string | null => {
-    const match = url.match(/(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/);
-    return match ? match[1] : null;
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
   };
 
   const playSong = (url: string) => {
     const videoId = extractVideoId(url);
+    console.log("🎵 Extracted VideoId:", videoId); // ✅ debug
     if (videoId) {
       setPlayingVideoId(videoId);
     } else {
@@ -276,10 +280,13 @@ const PlaylistScreen: React.FC = () => {
       {/* Sticky YouTube Player */}
       {playingVideoId && (
         <View
-          style={[styles.playerContainer, { borderColor: theme.colors.border }]}
+          style={[
+            styles.playerContainer,
+            { borderColor: theme.colors.border, backgroundColor: theme.colors.card },
+          ]}
         >
           <YoutubePlayer
-            height={90}
+            height={220} // ✅ taller so video is visible
             play={true}
             videoId={playingVideoId}
             onChangeState={(state) => {
@@ -385,6 +392,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderTopWidth: 1,
-    backgroundColor: "#000",
+    height: 220, // ✅ make video visible
   },
 });
