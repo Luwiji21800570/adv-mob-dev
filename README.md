@@ -30,6 +30,10 @@
 ![Screenshot 22](./screenshots/spot22.jpg)
 
 
+=================WEEK 6 ACTIVITY 1=================
+![Screenshot 23](./screenshots/spot23.jpg)
+![Screenshot 24](./screenshots/spot24.jpg)
+![Screenshot 25](./screenshots/spot25.jpg)
 
 
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).

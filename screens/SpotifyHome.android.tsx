@@ -64,16 +64,18 @@ const SpotifyHome: React.FC = () => {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.navBtn, { backgroundColor: theme.colors.primary }]}
-          onPress={toggleDrawer}
-        >
-          <Text style={styles.navBtnText}>☰</Text>
-        </TouchableOpacity>
         <Text style={[styles.greeting, { color: theme.colors.text }]}>
           Good Evening
+          
         </Text>
+          {/* Floating Drawer Button */}
       </View>
+          <TouchableOpacity
+            style={[styles.drawerFloatingBtn, { backgroundColor: theme.colors.primary }]}
+            onPress={toggleDrawer}
+          >
+            <Text style={styles.navBtnText}>☰</Text>
+          </TouchableOpacity>
 
       <ScrollView>
         {/* RECENTLY PLAYED GRID */}
@@ -345,4 +347,6 @@ const styles = StyleSheet.create({
   drawerItem: { flexDirection: "row", alignItems: "center", paddingVertical: 12 },
   drawerIcon: { fontSize: 18, marginRight: 10 },
   drawerText: { fontSize: 16 },
+    
+    
 });

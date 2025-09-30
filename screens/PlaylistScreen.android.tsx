@@ -306,10 +306,12 @@ const styles = StyleSheet.create({
   header: { alignItems: "center", padding: 20 },
   backBtn: {
     position: "absolute",
-    top: 10,
+    top: 0,
     left: 10,
     padding: 8,
-  },
+    zIndex: 20,
+    elevation: 20,
+},
   backText: {
     fontSize: 16,
     fontWeight: "600",
