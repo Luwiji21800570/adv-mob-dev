@@ -30,7 +30,7 @@
 
 =================WEEK 5 ACTIVITY 2=================
 ![Screenshot 22](./screenshots/spot22.jpg)
-
+![Screenshot 22](./screenshots/spot22.jpg)
 
 
 
