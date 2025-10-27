@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Provider, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { GestureHandlerRootView } from "react-native-gesture-handler"; // 👈 ADD THIS
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { store } from "./src/store";
 import { setTheme, setAccentColor } from "./src/store/themeSlice";
@@ -18,6 +18,8 @@ import SpotifySettings from "./screens/SpotifySettings";
 import SpotifySignUp from "./screens/SpotifySignUp";
 import PlaylistScreen from "./screens/PlaylistScreen";
 import CameraScreen from "./screens/CameraScreen";
+import MapScreen from "./screens/MapScreen";
+import PokemonList from "./screens/PokemonList"; // 👈 NEW
 
 export type RootStackParamList = {
   HomeScreen: undefined;
@@ -28,6 +30,8 @@ export type RootStackParamList = {
   SpotifySignUp: undefined;
   Playlist: { playlist: any };
   Camera: undefined;
+  Map: undefined;
+  PokemonList: undefined; // 👈 NEW
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -55,7 +59,7 @@ function ThemeLoader({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>   {/* 👈 Wrap the whole app */}
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <ThemeLoader>
           <NavigationContainer>
@@ -98,6 +102,17 @@ export default function App() {
               <Stack.Screen
                 name="Camera"
                 component={CameraScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Map"
+                component={MapScreen}
+                options={{ headerShown: false }}
+              />
+              {/* 👇 NEW SCREEN */}
+              <Stack.Screen
+                name="PokemonList"
+                component={PokemonList}
                 options={{ headerShown: false }}
               />
             </Stack.Navigator>

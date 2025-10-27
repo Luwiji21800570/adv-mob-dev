@@ -44,6 +44,23 @@
 ![Screenshot 25](./screenshots/spot25.jpg)
 
 
+
+
+
+=================WEEK 7 ACTIVITY 1=================
+
+
+
+
+
+![Screenshot 26](./pkmn1.jpg)
+![Screenshot 27](./pkmn2.jpg)
+
+
+
+
+
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started

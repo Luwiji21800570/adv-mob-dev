@@ -139,6 +139,16 @@ const SpotifySettings: React.FC = () => {
           ))}
         </View>
       </View>
+            {/* Navigate to Map */}
+            <TouchableOpacity
+              style={[
+                styles.mapBtn,
+                { backgroundColor: theme.colors.primary },
+              ]}
+              onPress={() => navigation.navigate("Map")}
+            >
+              <Text style={styles.mapText}>Open Map</Text>
+            </TouchableOpacity>
 
       {/* Logout */}
       <TouchableOpacity
@@ -213,4 +223,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+    mapBtn: {
+      marginTop: 20,
+      paddingVertical: 15,
+      borderRadius: 30,
+      alignItems: "center",
+    },
+    mapText: {
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+
 });

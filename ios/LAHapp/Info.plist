@@ -32,7 +32,12 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+    <string>This app requires access to your location to show your position on the map.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app needs your location even when running in the background for geofencing features.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We use your location to notify you when you enter or exit certain areas.</string>
+
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

@@ -4,7 +4,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../App';
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+// Match your App.tsx stack key exactly → 'HomeScreen'
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'HomeScreen'
+>;
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -12,9 +16,26 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to my app</Text>
-      <Button title="Go to Component Showcase" onPress={() => navigation.navigate('ComponentShowcase')} />
+
+      <Button
+        title="Go to Component Showcase"
+        onPress={() => navigation.navigate('Spotify')} // ✅ Updated to an existing screen
+      />
+
       <View style={{ marginTop: 20 }}>
-        <Button title="Go to Spotify Screen" onPress={() => navigation.navigate('Spotify')} />
+        <Button
+          title="Go to Spotify Screen"
+          onPress={() => navigation.navigate('Spotify')}
+        />
+      </View>
+
+      {/* 👇 NEW BUTTON for the Pokémon List */}
+      <View style={{ marginTop: 20 }}>
+        <Button
+          title="Go to Pokémon List"
+          onPress={() => navigation.navigate('PokemonList')}
+          color="#EF5350" // Pokémon red accent
+        />
       </View>
     </View>
   );
