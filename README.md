@@ -53,8 +53,8 @@
 
 
 
-![Screenshot 26](./pkmn1.jpg)
-![Screenshot 27](./pkmn2.jpg)
+![Screenshot 26](./screenshots/pkmn1.jpg)
+![Screenshot 27](./screenshots/pkmn2.jpg)
 
 
 
